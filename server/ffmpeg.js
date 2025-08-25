@@ -117,6 +117,31 @@ export async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec
     } catch (cleanupErr) {
       console.warn('Could not clean up original file:', cleanupErr.message);
     }
+
+    // Clean up individual part files after creating zip (keep only the zip)
+    try {
+      for (const part of parts) {
+        if (fs.existsSync(part.file)) {
+          fs.unlinkSync(part.file);
+          console.log('Cleaned up part file:', path.basename(part.file));
+        }
+      }
+      console.log('Successfully cleaned up all part files, keeping only the zip');
+    } catch (cleanupErr) {
+      console.warn('Could not clean up part files:', cleanupErr.message);
+    }
+
+    // Schedule cleanup of the entire output directory after 1 hour to give users time to download
+    setTimeout(() => {
+      try {
+        if (fs.existsSync(outputDir)) {
+          fs.rmSync(outputDir, { recursive: true, force: true });
+          console.log('Cleaned up entire output directory:', path.basename(outputDir));
+        }
+      } catch (cleanupErr) {
+        console.warn('Could not clean up output directory:', cleanupErr.message);
+      }
+    }, 60 * 60 * 1000); // 1 hour delay
   } catch (err) {
     console.error('Video processing error:', err);
     setError(jobId, err.message || err);

@@ -57,7 +57,21 @@ function combineChunks(sessionId) {
   writeStream.end();
   session.completed = true;
   session.finalPath = finalPath;
-  
+
+  // Schedule cleanup of the uploaded file after 2 hours to give processing time
+  setTimeout(() => {
+    try {
+      if (fs.existsSync(finalPath)) {
+        fs.unlinkSync(finalPath);
+        console.log('Cleaned up uploaded file:', path.basename(finalPath));
+      }
+    } catch (cleanupErr) {
+      console.warn('Could not clean up uploaded file:', cleanupErr.message);
+    }
+    // Remove session from memory
+    uploadSessions.delete(sessionId);
+  }, 2 * 60 * 60 * 1000); // 2 hours delay
+
   return {
     progress: 100,
     completed: true,

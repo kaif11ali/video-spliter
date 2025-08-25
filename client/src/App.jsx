@@ -126,8 +126,8 @@ export default function App() {
   return (
     <div className="wrap">
       <div className="card">
-        <h1>Movie Splitter</h1>
-        <p className="muted">Upload full movies and split them into smaller parts. Perfect for long videos and movies.</p>
+        <h1>Video Splitter</h1>
+        <p className="muted">Upload videos and split them into smaller parts. Perfect for social media, courses, and content creation.</p>
 
         <form onSubmit={onSubmit}>
           <div style={{margin:'18px 0'}}>
