@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Splitter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+      :root { --bg:#0f172a; --card:#111827; --muted:#94a3b8; --accent:#22d3ee; }
+      body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; background: linear-gradient(180deg,#0f172a,#0b1020); color:#e5e7eb; }
+      .wrap { max-width: 900px; margin: 40px auto; padding: 24px; }
+      .card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); }
+      h1 { font-weight:800; letter-spacing: -0.02em; margin: 0 0 6px; }
+      p.muted { color: var(--muted); margin-top:0; }
+      .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+      label { font-weight:600; font-size: 14px; color:#cbd5e1; }
+      input[type="file"], input[type="text"], input[type="number"] { width:100%; padding:12px 14px; border-radius: 12px; border:1px solid rgba(255,255,255,0.1); background: #0b1220; color:#e2e8f0; outline:none; }
+      input::placeholder { color:#64748b; }
+      .row { display:flex; gap:12px; align-items:center; }
+      .btn { background: linear-gradient(135deg, #22d3ee, #60a5fa); color:#0b1020; border:none; padding:12px 18px; border-radius: 12px; font-weight:700; cursor:pointer; box-shadow: 0 8px 30px rgba(96,165,250,0.25); }
+      .btn:disabled { opacity: 0.6; cursor:not-allowed; }
+      .progress { height:10px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow:hidden; }
+      .bar { height: 100%; background: linear-gradient(90deg, #22d3ee, #60a5fa); width: 0%; transition: width .35s ease; }
+      .downloads a { display:inline-block; margin: 8px 8px 0 0; padding:10px 12px; border:1px solid rgba(255,255,255,0.12); border-radius: 10px; color:#e2e8f0; text-decoration:none; }
+      footer { margin-top:18px; color:#64748b; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
