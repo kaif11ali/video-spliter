@@ -42,7 +42,7 @@
         font-family: 'Playfair Display', serif;
         font-size: 2rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+        background: linear-gradient(135deg, #7b5141 0%, #d4a574 50%, #b8956a 100%);
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -84,7 +84,7 @@
         margin-bottom: 2rem;
         line-height: 1;
         letter-spacing: -0.02em;
-        background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+        background: linear-gradient(135deg, #7b5141 0%, #d4a574 50%, #b8956a 100%);
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -151,7 +151,7 @@
         font-size: clamp(2.2rem, 4vw, 3.2rem);
         font-weight: 700;
         margin-bottom: 4rem;
-        background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+        background: linear-gradient(135deg, #7b5141 0%, #d4a574 50%, #b8956a 100%);
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -169,6 +169,7 @@
         background: rgba(255, 255, 255, 0.6);
         border-radius: 20px;
         padding: 2rem;
+        padding-top: 60px;
         border: 1px solid rgba(139, 92, 46, 0.15);
         backdrop-filter: blur(20px);
         transition: all 0.3s ease;
@@ -209,6 +210,26 @@
         border: 1px solid rgba(139, 92, 46, 0.1);
       }
 
+      /* Video Styles */
+      .video-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #f5f1e8;
+      }
+
+      .video-container video::-webkit-media-controls-panel {
+        background: linear-gradient(rgba(139, 92, 46, 0.8), rgba(139, 92, 46, 0.8));
+      }
+
+      /* Video fallback when no video is loaded */
+      .video-container video:empty + .video-placeholder,
+      .video-container video[src=""] + .video-placeholder,
+      .video-container video:not([src]) + .video-placeholder {
+        display: flex;
+      }
+
       .video-placeholder {
         width: 100%;
         height: 100%;
@@ -217,7 +238,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: #8b5c2e;
+        color: #7b5141;
         font-size: 1rem;
         font-weight: 500;
         position: relative;
@@ -226,7 +247,7 @@
       .play-icon {
         width: 60px;
         height: 60px;
-        background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+        background: linear-gradient(135deg, #7b5141 0%, #d4a574 50%, #b8956a 100%);
         border-radius: 50%;
         margin-bottom: 1rem;
         opacity: 0.8;
@@ -332,7 +353,7 @@
       }
 
       ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 100%);
+        background: linear-gradient(135deg, #7b5141 0%, #d4a574 100%);
         border-radius: 4px;
       }
 
@@ -345,7 +366,7 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+        background: linear-gradient(135deg, #7b5141 0%, #d4a574 50%, #b8956a 100%);
         color: #ffffff;
         padding: 1.2rem 2.5rem;
         border-radius: 15px;
@@ -393,20 +414,47 @@
       <h2 class="portfolio-title">Before & After</h2>
       <div class="video-grid">
         <div class="video-card">
-          <div class="video-label">Before</div>
+
           <div class="video-container">
-            <div class="video-placeholder">
-              <div class="play-icon"></div>
-              <span>Original Video</span>
+            <video 
+              autoplay
+              muted
+              loop
+              controls 
+              preload="auto"
+              style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+              onloadeddata="this.nextElementSibling.style.display='none'"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+              <source src="./videos/before1-video.mp4" type="video/mp4">
+              <source src="./videos/before-video.webm" type="video/webm">
+            </video>
+            <div class="video-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: rgba(0,0,0,0.1); border-radius: 8px;">
+              <span>Original long video will appear here</span>
+              <small style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
+                Video: before-video.mp4
+              </small>
             </div>
           </div>
         </div>
         <div class="video-card">
-          <div class="video-label">After</div>
           <div class="video-container">
-            <div class="video-placeholder">
-              <div class="play-icon"></div>
-              <span>Split Video Parts</span>
+            <video 
+              autoplay
+              muted
+              loop
+              controls 
+              preload="auto"
+              style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+              onloadeddata="this.nextElementSibling.style.display='none'"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+              <source src="./videos/after-video.mp4" type="video/mp4">
+              <source src="./videos/after-video.webm" type="video/webm">
+            </video>
+            <div class="video-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: rgba(0,0,0,0.1); border-radius: 8px;">
+              <span>Split video clips will appear here</span>
+              <small style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
+                Video: after-video.mp4
+              </small>
             </div>
           </div>
         </div>
