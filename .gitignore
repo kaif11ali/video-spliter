@@ -5,42 +5,40 @@ yarn-debug.log*
 yarn-error.log*
 
 # Production builds
-/client/dist/
-/client/build/
+dist/
+build/
 
-# Environment files
+# Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Uploaded files and generated content
-/server/uploads/
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Upload directories and processed files
+server/uploads/
 *.mp4
 *.avi
 *.mov
 *.mkv
-*.webm
+*.zip
 
-# IDE and OS files
-.vscode/
-.DS_Store
-Thumbs.db
-
-# Logs
-logs/
-*.log
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Temporary folders
-tmp/
-temp/
+# Temporary files
+*.tmp
+*.temp

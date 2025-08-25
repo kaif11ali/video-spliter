@@ -5,28 +5,36 @@ import archiver from 'archiver';
 import { secondsToTimestamp } from './utils.js';
 import { setProgress, setStatus, setParts, setZip, setError } from './progressStore.js';
 
-// Configure FFmpeg paths
-if (process.env.NODE_ENV === 'production') {
-  // In production (Railway/Heroku), FFmpeg is installed globally
+// Configure FFmpeg paths - will use system PATH if available
+try {
+  // Try to use system FFmpeg first
   ffmpeg.setFfmpegPath('ffmpeg');
   ffmpeg.setFfprobePath('ffprobe');
-} else {
-  // Local development paths
-  ffmpeg.setFfmpegPath('C:\\ffmpeg-7.1.1-full_build\\bin\\ffmpeg.exe');
-  ffmpeg.setFfprobePath('C:\\ffmpeg-7.1.1-full_build\\bin\\ffprobe.exe');
+} catch (error) {
+  // Fallback to specific paths if needed
+  const ffmpegPath = process.env.FFMPEG_PATH || 'C:\\ffmpeg-7.1.1-full_build\\bin\\ffmpeg.exe';
+  const ffprobePath = process.env.FFPROBE_PATH || 'C:\\ffmpeg-7.1.1-full_build\\bin\\ffprobe.exe';
+  ffmpeg.setFfmpegPath(ffmpegPath);
+  ffmpeg.setFfprobePath(ffprobePath);
 }
 
 export function getDuration(filePath) {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(filePath, (err, metadata) => {
-      if (err) return reject(err);
+      if (err) {
+        console.error('FFprobe error:', err);
+        return reject(new Error('Failed to analyze video file. Please ensure FFmpeg is installed.'));
+      }
       const duration = metadata.format?.duration || 0;
+      if (duration <= 0) {
+        return reject(new Error('Invalid video file or zero duration.'));
+      }
       resolve(duration);
     });
   });
 }
 
-export async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, publicBase }) {
+export async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quality = 'medium', publicBase }) {
   try {
     setStatus(jobId, 'processing');
 
@@ -48,12 +56,40 @@ export async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec
       const duration = Math.min(partSec, usableDur - partStartFromTrimmed);
       const out = path.join(outputDir, `part_${String(i+1).padStart(3, '0')}.mp4`);
 
-      // Use keyframe-safe copying when possible; fallback to re-encode for exact cuts
+      // Use stream copying for faster processing when possible
+      const needsReencoding = (absoluteStart % 1 !== 0) || (duration % 1 !== 0);
+      
+      // Quality presets
+      const qualitySettings = {
+        fast: { preset: 'ultrafast', crf: 28 },
+        medium: { preset: 'medium', crf: 23 },
+        high: { preset: 'slow', crf: 18 }
+      };
+      
       await new Promise((resolve, reject) => {
-        ffmpeg(inputPath)
+        const command = ffmpeg(inputPath)
           .setStartTime(secondsToTimestamp(absoluteStart))
-          .duration(duration)
-          .outputOptions(['-c:v libx264', '-c:a aac', '-movflags +faststart'])
+          .duration(duration);
+        
+        if (needsReencoding) {
+          // Re-encode with quality settings
+          const settings = qualitySettings[quality] || qualitySettings.medium;
+          command.outputOptions([
+            '-c:v libx264', 
+            `-preset ${settings.preset}`,
+            `-crf ${settings.crf}`,
+            '-c:a aac', 
+            '-movflags +faststart'
+          ]);
+        } else {
+          // Stream copy for exact keyframe cuts (much faster)
+          command.outputOptions([
+            '-c copy', // No re-encoding
+            '-avoid_negative_ts make_zero'
+          ]);
+        }
+        
+        command
           .output(out)
           .on('end', resolve)
           .on('error', reject)
@@ -74,8 +110,25 @@ export async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec
     setZip(jobId, zipUrl);
 
     setStatus(jobId, 'done');
+
+    // Clean up original uploaded file after successful processing
+    try {
+      fs.unlinkSync(inputPath);
+    } catch (cleanupErr) {
+      console.warn('Could not clean up original file:', cleanupErr.message);
+    }
   } catch (err) {
+    console.error('Video processing error:', err);
     setError(jobId, err.message || err);
+    
+    // Clean up original uploaded file on error
+    try {
+      if (fs.existsSync(inputPath)) {
+        fs.unlinkSync(inputPath);
+      }
+    } catch (cleanupErr) {
+      console.warn('Could not clean up original file after error:', cleanupErr.message);
+    }
   }
 }
 

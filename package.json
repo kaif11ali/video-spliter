@@ -1,19 +1,26 @@
 {
-  "name": "video-splitter-client",
-  "private": true,
+  "name": "video-splitter",
   "version": "1.0.0",
-  "type": "module",
+  "description": "A video splitting application",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && npm run install:server && npm run install:client",
+    "install:server": "cd server && npm install",
+    "install:client": "cd client && npm install",
+    "build": "cd client && npm run build",
+    "clean": "rimraf server/uploads/* client/dist server/node_modules client/node_modules"
   },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
+  "keywords": ["video", "splitter", "ffmpeg"],
+  "license": "ISC",
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.0"
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
   }
 }
