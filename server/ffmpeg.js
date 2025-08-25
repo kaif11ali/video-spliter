@@ -6,8 +6,15 @@ import { secondsToTimestamp } from './utils.js';
 import { setProgress, setStatus, setParts, setZip, setError } from './progressStore.js';
 
 // Configure FFmpeg paths
-ffmpeg.setFfmpegPath('C:\\ffmpeg-7.1.1-full_build\\bin\\ffmpeg.exe');
-ffmpeg.setFfprobePath('C:\\ffmpeg-7.1.1-full_build\\bin\\ffprobe.exe');
+if (process.env.NODE_ENV === 'production') {
+  // In production (Railway/Heroku), FFmpeg is installed globally
+  ffmpeg.setFfmpegPath('ffmpeg');
+  ffmpeg.setFfprobePath('ffprobe');
+} else {
+  // Local development paths
+  ffmpeg.setFfmpegPath('C:\\ffmpeg-7.1.1-full_build\\bin\\ffmpeg.exe');
+  ffmpeg.setFfprobePath('C:\\ffmpeg-7.1.1-full_build\\bin\\ffprobe.exe');
+}
 
 export function getDuration(filePath) {
   return new Promise((resolve, reject) => {

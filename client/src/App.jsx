@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
-const API = 'http://localhost:4000';
+const API = process.env.NODE_ENV === 'production' 
+  ? 'https://your-backend-url.railway.app' // Replace with your deployed backend URL
+  : 'http://localhost:4000';
 
 export default function App() {
   const [video, setVideo] = useState(null)
