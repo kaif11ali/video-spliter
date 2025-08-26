@@ -205,6 +205,181 @@
       box-shadow: 0 4px 15px rgba(139, 92, 46, 0.1);
     }
 
+    /* Video part buttons styling */
+    .video-part-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+      padding: 0.75rem 1.25rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+      min-width: 120px;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-part-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .video-part-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      background: linear-gradient(135deg, #5a6fd8 0%, #6b4d9a 100%);
+    }
+
+    .video-part-btn:hover::before {
+      left: 100%;
+    }
+
+    .video-part-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .video-part-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+      background: linear-gradient(135deg, #95a5f0 0%, #a49bc4 100%);
+    }
+
+    .video-part-btn:disabled::before {
+      display: none;
+    }
+
+    /* Success state for downloaded parts */
+    .video-part-btn.downloaded {
+      background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+      box-shadow: 0 4px 15px rgba(86, 171, 47, 0.2);
+    }
+
+    .video-part-btn.downloaded:hover {
+      background: linear-gradient(135deg, #4e9a2a 0%, #96d4b7 100%);
+      box-shadow: 0 8px 25px rgba(86, 171, 47, 0.3);
+    }
+
+    /* Downloading state animation */
+    .video-part-btn.downloading {
+      background: linear-gradient(135deg, #ff9500 0%, #ffb347 100%);
+      box-shadow: 0 4px 15px rgba(255, 149, 0, 0.2);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* ZIP download button styling */
+    .zip-download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 1rem 1rem 0;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(139, 92, 46, 0.3);
+      min-width: 180px;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .zip-download-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .zip-download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(139, 92, 46, 0.4);
+      background: linear-gradient(135deg, #7a4f26 0%, #c49968 50%, #a6865e 100%);
+    }
+
+    .zip-download-btn:hover::before {
+      left: 100%;
+    }
+
+    .zip-download-btn:active {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(139, 92, 46, 0.3);
+    }
+
+    .zip-download-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 6px 20px rgba(139, 92, 46, 0.2);
+      background: linear-gradient(135deg, #b8956a 0%, #d4c09e 50%, #c4a582 100%);
+    }
+
+    .zip-download-btn:disabled::before {
+      display: none;
+    }
+
+    .zip-download-btn.downloaded {
+      background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+      box-shadow: 0 6px 20px rgba(86, 171, 47, 0.3);
+    }
+
+    .zip-download-btn.downloaded:hover {
+      background: linear-gradient(135deg, #4e9a2a 0%, #96d4b7 100%);
+      box-shadow: 0 10px 30px rgba(86, 171, 47, 0.4);
+    }
+
+    .zip-download-btn.downloading {
+      background: linear-gradient(135deg, #ff9500 0%, #ffb347 100%);
+      box-shadow: 0 6px 20px rgba(255, 149, 0, 0.3);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Download buttons container */
+    .download-buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .download-section-title {
+      margin: 1rem 0 0.5rem 0;
+      color: #3c3530;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
     .progress-container {
       margin-top: 1rem;
     }
@@ -645,23 +820,32 @@
       if (zipPath) {
         const zipButton = document.createElement('button');
         zipButton.textContent = '📦 Download All (ZIP)';
-        zipButton.className = 'upload-btn';
-        zipButton.style.marginRight = '1rem';
-        zipButton.style.marginBottom = '0.5rem';
+        zipButton.className = 'zip-download-btn';
         zipButton.onclick = async () => {
           try {
+            // Set downloading state
             zipButton.disabled = true;
+            zipButton.classList.add('downloading');
             zipButton.textContent = '⏳ Downloading...';
+            
             const result = await window.electronAPI.downloadFile(zipPath, 'clips.zip');
+            
+            // Remove downloading state
+            zipButton.classList.remove('downloading');
+            
             if (result.success) {
               statusText.textContent = 'ZIP file downloaded to Downloads folder!';
               zipButton.textContent = '✅ Downloaded';
+              zipButton.classList.add('downloaded');
+              zipButton.disabled = false;
             } else {
               statusText.textContent = 'Download failed: ' + result.error;
               zipButton.textContent = '📦 Download All (ZIP)';
               zipButton.disabled = false;
             }
           } catch (error) {
+            // Remove downloading state on error
+            zipButton.classList.remove('downloading');
             statusText.textContent = 'Download failed: ' + error.message;
             zipButton.textContent = '📦 Download All (ZIP)';
             zipButton.disabled = false;
@@ -670,34 +854,56 @@
         downloadLinks.appendChild(zipButton);
       }
       
-      parts.forEach((part, i) => {
-        const button = document.createElement('button');
-        button.textContent = `🎬 Part ${i + 1}`;
-        button.className = 'upload-btn';
-        button.style.marginRight = '0.5rem';
-        button.style.marginBottom = '0.5rem';
-        button.onclick = async () => {
-          try {
-            const fileName = `part_${String(i + 1).padStart(3, '0')}.mp4`;
-            button.disabled = true;
-            button.textContent = '⏳ Downloading...';
-            const result = await window.electronAPI.downloadFile(part.url, fileName);
-            if (result.success) {
-              statusText.textContent = `Part ${i + 1} downloaded to Downloads folder!`;
-              button.textContent = `✅ Part ${i + 1}`;
-            } else {
-              statusText.textContent = 'Download failed: ' + result.error;
+      if (parts && parts.length > 0) {
+        const partsTitle = document.createElement('div');
+        partsTitle.className = 'download-section-title';
+        partsTitle.textContent = '🎬 Individual Parts:';
+        downloadLinks.appendChild(partsTitle);
+        
+        const partsContainer = document.createElement('div');
+        partsContainer.className = 'download-buttons-container';
+        
+        parts.forEach((part, i) => {
+          const button = document.createElement('button');
+          button.textContent = `🎬 Part ${i + 1}`;
+          button.className = 'video-part-btn';
+          button.onclick = async () => {
+            try {
+              const fileName = `part_${String(i + 1).padStart(3, '0')}.mp4`;
+              
+              // Set downloading state
+              button.disabled = true;
+              button.classList.add('downloading');
+              button.textContent = '⏳ Downloading...';
+              
+              const result = await window.electronAPI.downloadFile(part.url, fileName);
+              
+              // Remove downloading state
+              button.classList.remove('downloading');
+              
+              if (result.success) {
+                statusText.textContent = `Part ${i + 1} downloaded to Downloads folder!`;
+                button.textContent = `✅ Part ${i + 1}`;
+                button.classList.add('downloaded');
+                button.disabled = false;
+              } else {
+                statusText.textContent = 'Download failed: ' + result.error;
+                button.textContent = `🎬 Part ${i + 1}`;
+                button.disabled = false;
+              }
+            } catch (error) {
+              // Remove downloading state on error
+              button.classList.remove('downloading');
+              statusText.textContent = 'Download failed: ' + error.message;
               button.textContent = `🎬 Part ${i + 1}`;
               button.disabled = false;
             }
-          } catch (error) {
-            statusText.textContent = 'Download failed: ' + error.message;
-            button.textContent = `🎬 Part ${i + 1}`;
-            button.disabled = false;
-          }
-        };
-        downloadLinks.appendChild(button);
-      });
+          };
+          partsContainer.appendChild(button);
+        });
+        
+        downloadLinks.appendChild(partsContainer);
+      }
       
       downloads.classList.remove('hidden');
     }
