@@ -83,6 +83,43 @@ ipcMain.handle('select-file', async () => {
   return result;
 });
 
+// Handle file reading - just get file info, not the actual content
+ipcMain.handle('get-file-info', async (event, filePath) => {
+  const fs = require('fs');
+  try {
+    const stats = fs.statSync(filePath);
+    return {
+      success: true,
+      size: stats.size,
+      name: require('path').basename(filePath),
+      path: filePath
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// Handle file stream creation for upload
+ipcMain.handle('create-file-stream', async (event, filePath) => {
+  const fs = require('fs');
+  try {
+    // Check if file exists and is readable
+    await fs.promises.access(filePath, fs.constants.R_OK);
+    return {
+      success: true,
+      path: filePath
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {

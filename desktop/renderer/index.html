@@ -4,123 +4,213 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Video Splitter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f7f3e9 0%, #ede4d3 30%, #e8dcc6 70%, #f2e9d8 100%);
+      color: #2d2926;
       min-height: 100vh;
-      color: #333;
+      overflow-x: hidden;
+      padding: 0;
     }
 
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      overflow: hidden;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      padding: 3rem;
+      border: 1px solid rgba(139, 92, 46, 0.2);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 50px rgba(139, 92, 46, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(139, 92, 46, 0.3);
+      box-shadow: 0 30px 60px rgba(139, 92, 46, 0.15);
     }
 
     .header {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      padding: 30px;
       text-align: center;
-      color: white;
+      margin-bottom: 2.5rem;
     }
 
     .header h1 {
-      margin: 0;
-      font-size: 2rem;
-      font-weight: 300;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
     }
 
-    .content {
-      padding: 30px;
+    .muted {
+      color: #6b5b52;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .upload-section {
+      margin-bottom: 2rem;
     }
 
     .upload-area {
-      border: 2px dashed #ddd;
-      border-radius: 8px;
-      padding: 40px 20px;
+      border: 2px dashed rgba(139, 92, 46, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
       text-align: center;
       cursor: pointer;
       transition: all 0.3s ease;
-      margin-bottom: 20px;
+      margin-bottom: 1rem;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
     }
 
     .upload-area:hover {
-      border-color: #4facfe;
-      background: #f8f9ff;
+      border-color: rgba(139, 92, 46, 0.5);
+      background: rgba(255, 255, 255, 0.8);
     }
 
     .upload-area.dragover {
-      border-color: #4facfe;
-      background: #f0f8ff;
+      border-color: rgba(139, 92, 46, 0.7);
+      background: rgba(255, 255, 255, 0.9);
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: rgba(139, 92, 46, 0.6);
+      margin-bottom: 1rem;
+    }
+
+    .upload-text {
+      font-size: 1.2rem;
+      color: #6b5b52;
+      margin-bottom: 1rem;
+    }
+
+    .upload-subtext {
+      font-size: 0.9rem;
+      color: #8b8680;
+    }
+
+    .btn-select-file {
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.2);
+    }
+
+    .btn-select-file:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 46, 0.3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 1.5rem;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
+      color: #3c3530;
       font-weight: 500;
-      color: #555;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
     }
 
-    input, select {
+    input[type="text"], 
+    select {
       width: 100%;
-      padding: 12px;
-      border: 2px solid #e1e5e9;
-      border-radius: 6px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
+      padding: 0.875rem 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(139, 92, 46, 0.2);
+      border-radius: 12px;
+      color: #3c3530;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      font-family: inherit;
     }
 
-    input:focus, select:focus {
+    input[type="text"]:focus, 
+    select:focus {
       outline: none;
-      border-color: #4facfe;
-    }
-
-    .row {
-      display: flex;
-      gap: 15px;
-      align-items: center;
+      border-color: rgba(139, 92, 46, 0.4);
+      box-shadow: 0 0 0 3px rgba(139, 92, 46, 0.1);
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .btn {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
       color: white;
       border: none;
-      padding: 15px 30px;
-      border-radius: 6px;
-      font-size: 16px;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-weight: 500;
+      font-family: inherit;
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.2);
     }
 
     .btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+      box-shadow: 0 8px 25px rgba(139, 92, 46, 0.3);
     }
 
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
-      box-shadow: none;
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.1);
+    }
+
+    .progress-container {
+      margin-top: 1rem;
     }
 
     .progress {
-      background: #f1f3f4;
+      background: rgba(139, 92, 46, 0.1);
       border-radius: 10px;
       overflow: hidden;
       height: 8px;
@@ -128,92 +218,143 @@
     }
 
     .bar {
-      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      background: linear-gradient(90deg, #8b5c2e, #d4a574);
       height: 100%;
       transition: width 0.3s ease;
     }
 
+    .status-text {
+      font-size: 0.9rem;
+      color: #6b5b52;
+      text-align: center;
+    }
+
     .downloads {
-      margin-top: 20px;
-      padding: 20px;
-      background: #f8f9fa;
-      border-radius: 8px;
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      border: 1px solid rgba(139, 92, 46, 0.1);
     }
 
     .downloads h3 {
-      margin: 0 0 15px 0;
-      color: #333;
+      margin: 0 0 1rem 0;
+      color: #3c3530;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
     }
 
     .downloads a {
       display: inline-block;
       margin: 5px 10px 5px 0;
-      padding: 8px 16px;
-      background: #4facfe;
+      padding: 0.6rem 1.2rem;
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
       color: white;
       text-decoration: none;
-      border-radius: 4px;
-      font-size: 14px;
-      transition: background 0.3s ease;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
 
     .downloads a:hover {
-      background: #3b9cfe;
-    }
-
-    footer {
-      margin-top: 30px;
-      padding: 20px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #666;
-      line-height: 1.5;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.3);
     }
 
     .file-info {
-      background: #e8f5e8;
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      border-left: 4px solid #4caf50;
+      background: rgba(139, 92, 46, 0.1);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid #8b5c2e;
     }
 
     .file-name {
       font-weight: 500;
-      color: #2e7d32;
+      color: #3c3530;
+      margin-bottom: 0.2rem;
     }
 
     .file-size {
-      color: #666;
-      font-size: 14px;
+      color: #6b5b52;
+      font-size: 0.9rem;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: #6b5b52;
+      line-height: 1.6;
+      border: 1px solid rgba(139, 92, 46, 0.1);
+    }
+
+    .footer strong {
+      color: #3c3530;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .container {
+        padding: 0 1rem;
+      }
+      
+      .card {
+        padding: 2rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>🎬 Video Splitter</h1>
-    </div>
-    
-    <div class="content">
+    <div class="card">
+      <div class="header">
+        <h1>🎬Splittter.kf</h1>
+        <p class="muted">Transform your videos with precision and elegance</p>
+      </div>
+      
       <form id="uploadForm">
-        <div class="upload-area" id="uploadArea">
-          <p>📁 Click here or drag and drop your video file</p>
-          <input type="file" id="videoFile" accept="video/*" style="display: none;">
+        <div class="upload-section">
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Drag and drop your video file here</div>
+            <div class="upload-subtext">or</div>
+            <button type="button" class="btn-select-file" id="selectBtn">Select Video File</button>
+          </div>
+          <input type="file" id="videoFile" accept="video/*" class="hidden">
         </div>
         
-        <div id="fileInfo" class="file-info" style="display: none;">
+        <div id="fileInfo" class="file-info hidden">
           <div class="file-name" id="fileName"></div>
           <div class="file-size" id="fileSize"></div>
         </div>
 
-        <div class="row">
-          <div class="form-group" style="flex: 1;">
+        <div class="grid">
+          <div class="form-group">
             <label>Intro to remove (sec or mm:ss or hh:mm:ss)</label>
             <input type="text" id="intro" placeholder="e.g. 30 or 0:30" value="0">
           </div>
-          <div class="form-group" style="flex: 1;">
+          <div class="form-group">
             <label>Outro to remove (sec or mm:ss or hh:mm:ss)</label>
             <input type="text" id="outro" placeholder="e.g. 60 or 1:00" value="0">
           </div>
@@ -225,7 +366,7 @@
         </div>
 
         <div class="form-group">
-          <label>Processing Speed</label>
+          <label>Processing Quality</label>
           <select id="quality">
             <option value="fast">Fast (Lower Quality)</option>
             <option value="medium" selected>Medium (Balanced)</option>
@@ -233,27 +374,27 @@
           </select>
         </div>
 
-        <div class="row">
+        <div class="action-buttons">
           <button type="submit" class="btn" id="submitBtn">Split Video</button>
-          <div id="progressContainer" style="flex: 1; display: none;">
+          <div id="progressContainer" class="progress-container hidden">
             <div class="progress">
               <div class="bar" id="progressBar" style="width: 0%"></div>
             </div>
-            <small id="statusText">Ready</small>
+            <div class="status-text" id="statusText">Ready</div>
           </div>
         </div>
       </form>
 
-      <div id="downloads" class="downloads" style="display: none;">
-        <h3>Downloads</h3>
+      <div id="downloads" class="downloads hidden">
+        <h3>📥 Download Results</h3>
         <div id="downloadLinks"></div>
       </div>
 
-      <footer>
-        <strong>Movie Tips:</strong> For 3-hour movies, use 10-15 minute parts (600-900s). 
+      <div class="footer">
+        <strong>💡 Movie Tips:</strong> For 3-hour movies, use 10-15 minute parts (600-900s). 
         Supports formats like <strong>600</strong>, <strong>10:00</strong>, or <strong>0:10:00</strong>. 
         Maximum file size: 50GB.
-      </footer>
+      </div>
     </div>
   </div>
 
@@ -263,8 +404,9 @@
     let currentJobId = null;
     let progressInterval = null;
 
-    // File upload handling
+    // Get DOM elements
     const uploadArea = document.getElementById('uploadArea');
+    const selectBtn = document.getElementById('selectBtn');
     const fileInput = document.getElementById('videoFile');
     const fileInfo = document.getElementById('fileInfo');
     const fileName = document.getElementById('fileName');
@@ -277,8 +419,11 @@
     const downloads = document.getElementById('downloads');
     const downloadLinks = document.getElementById('downloadLinks');
 
-    // Drag and drop
-    uploadArea.addEventListener('click', () => {
+    // File selection via button
+    selectBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
       if (window.electronAPI) {
         selectFileDesktop();
       } else {
@@ -286,12 +431,26 @@
       }
     });
 
+    // File selection via drag and drop area click
+    uploadArea.addEventListener('click', (e) => {
+      // Only trigger if not clicking the select button
+      if (e.target === selectBtn) return;
+      
+      if (window.electronAPI) {
+        selectFileDesktop();
+      } else {
+        fileInput.click();
+      }
+    });
+
+    // Drag and drop events
     uploadArea.addEventListener('dragover', (e) => {
       e.preventDefault();
       uploadArea.classList.add('dragover');
     });
 
-    uploadArea.addEventListener('dragleave', () => {
+    uploadArea.addEventListener('dragleave', (e) => {
+      e.preventDefault();
       uploadArea.classList.remove('dragover');
     });
 
@@ -304,6 +463,7 @@
       }
     });
 
+    // File input change (for web fallback)
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
         handleFileSelect(e.target.files[0]);
@@ -316,25 +476,66 @@
         const result = await window.electronAPI.selectFile();
         if (!result.canceled && result.filePaths.length > 0) {
           const filePath = result.filePaths[0];
-          const stats = require('fs').statSync(filePath);
-          const file = {
-            name: require('path').basename(filePath),
-            size: stats.size,
-            path: filePath
-          };
-          handleFileSelect(file);
+          
+          // Extract file name from path
+          const fileName = filePath.split('\\').pop() || filePath.split('/').pop();
+          
+          // Get file information using the new API
+          const fileInfo = await window.electronAPI.getFileInfo(filePath);
+          
+          if (fileInfo.success) {
+            const file = {
+              name: fileName,
+              size: fileInfo.size,
+              path: filePath,
+              type: 'video/*',
+              electronFile: true
+            };
+            
+            handleFileSelect(file);
+          } else {
+            alert('Error reading file information: ' + fileInfo.error);
+          }
         }
       } catch (error) {
         console.error('File selection error:', error);
+        alert('Error selecting file: ' + error.message);
       }
     }
 
     function handleFileSelect(file) {
       selectedFile = file;
       fileName.textContent = file.name;
-      fileSize.textContent = formatFileSize(file.size);
-      fileInfo.style.display = 'block';
-      uploadArea.innerHTML = '<p>✅ File selected: ' + file.name + '</p>';
+      
+      // For desktop files, show size if available, otherwise show placeholder
+      if (file.size > 0) {
+        fileSize.textContent = formatFileSize(file.size);
+      } else {
+        fileSize.textContent = 'Size will be calculated during upload';
+      }
+      
+      fileInfo.classList.remove('hidden');
+      
+      // Update upload area to show selected file
+      uploadArea.innerHTML = `
+        <div class="upload-icon">✅</div>
+        <div class="upload-text">File Selected: ${file.name}</div>
+        <div class="upload-subtext">Click to select a different file</div>
+        <button type="button" class="btn-select-file" id="selectBtn">Select Different File</button>
+      `;
+      
+      // Re-attach event listener to new button
+      const newSelectBtn = document.getElementById('selectBtn');
+      newSelectBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (window.electronAPI) {
+          selectFileDesktop();
+        } else {
+          fileInput.click();
+        }
+      });
     }
 
     function formatFileSize(bytes) {
@@ -357,12 +558,24 @@
       const formData = new FormData();
       
       // Handle desktop vs web file
-      if (selectedFile.path) {
-        // Desktop: read file from path
-        const fs = require('fs');
-        const fileBuffer = fs.readFileSync(selectedFile.path);
-        const blob = new Blob([fileBuffer]);
-        formData.append('video', blob, selectedFile.name);
+      if (selectedFile.electronFile && selectedFile.path) {
+        // Desktop: Send file path to server (server will read the file)
+        try {
+          // Verify file access
+          const streamCheck = await window.electronAPI.createFileStream(selectedFile.path);
+          if (!streamCheck.success) {
+            alert('Error accessing file: ' + streamCheck.error);
+            return;
+          }
+
+          // Create form data with file path instead of file content
+          formData.append('filePath', selectedFile.path);
+          formData.append('fileName', selectedFile.name);
+          formData.append('isDesktopUpload', 'true');
+        } catch (error) {
+          alert('Error accessing file: ' + error.message);
+          return;
+        }
       } else {
         // Web: use file object directly
         formData.append('video', selectedFile);
@@ -375,7 +588,7 @@
 
       try {
         submitBtn.disabled = true;
-        progressContainer.style.display = 'block';
+        progressContainer.classList.remove('hidden');
         statusText.textContent = 'Uploading...';
 
         const response = await fetch(`${API}/api/split`, {
@@ -432,7 +645,7 @@
       if (zipPath) {
         const zipLink = document.createElement('a');
         zipLink.href = zipPath;
-        zipLink.textContent = 'Download all (ZIP)';
+        zipLink.textContent = '📦 Download All (ZIP)';
         zipLink.target = '_blank';
         downloadLinks.appendChild(zipLink);
       }
@@ -440,20 +653,44 @@
       parts.forEach((part, i) => {
         const link = document.createElement('a');
         link.href = part.url;
-        link.textContent = `Part ${i + 1}`;
+        link.textContent = `🎬 Part ${i + 1}`;
         link.target = '_blank';
         downloadLinks.appendChild(link);
       });
       
-      downloads.style.display = 'block';
+      downloads.classList.remove('hidden');
     }
 
     function resetForm() {
       submitBtn.disabled = false;
-      progressContainer.style.display = 'none';
+      progressContainer.classList.add('hidden');
       progressBar.style.width = '0%';
       statusText.textContent = 'Ready';
     }
+
+    // Initialize upload area on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Reset upload area to initial state
+      uploadArea.innerHTML = `
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">Drag and drop your video file here</div>
+        <div class="upload-subtext">or</div>
+        <button type="button" class="btn-select-file" id="selectBtn">Select Video File</button>
+      `;
+      
+      // Re-attach event listener
+      const newSelectBtn = document.getElementById('selectBtn');
+      newSelectBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (window.electronAPI) {
+          selectFileDesktop();
+        } else {
+          fileInput.click();
+        }
+      });
+    });
   </script>
 </body>
 </html>
