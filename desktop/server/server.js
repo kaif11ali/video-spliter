@@ -7,12 +7,43 @@ const { nanoid } = require('nanoid');
 const { parseToSeconds } = require('./utils.js');
 const { initJob, getJob } = require('./progressStore.js');
 const { splitVideo } = require('./ffmpeg.js');
+const net = require('net');
 
 const app = express();
-const PORT = 4000;
+let PORT = 4000;
+
+// Function to check if port is available
+function isPortAvailable(port) {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    
+    server.listen(port, () => {
+      server.once('close', () => {
+        resolve(true);
+      });
+      server.close();
+    });
+    
+    server.on('error', () => {
+      resolve(false);
+    });
+  });
+}
+
+// Function to find an available port
+async function findAvailablePort(startPort = 4000) {
+  let port = startPort;
+  while (port < startPort + 100) {
+    if (await isPortAvailable(port)) {
+      return port;
+    }
+    port++;
+  }
+  throw new Error('No available port found');
+}
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:4000', 'http://localhost:4001', 'http://localhost:4002'],
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Content-Length'],
   maxAge: 86400
@@ -196,6 +227,35 @@ function cleanupOldFiles() {
 
 setInterval(cleanupOldFiles, 30 * 60 * 1000);
 
-const server = app.listen(PORT, () => console.log(`➡️ Server running on http://localhost:${PORT}`));
+// Start server with dynamic port finding
+async function startServer() {
+  try {
+    PORT = await findAvailablePort(4000);
+    const server = app.listen(PORT, () => {
+      console.log(`➡️ Server running on http://localhost:${PORT}`);
+    });
+    
+    // Handle server errors
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.log(`Port ${PORT} is busy, trying another port...`);
+        server.close();
+        startServer();
+      } else {
+        console.error('Server error:', err);
+      }
+    });
+    
+    return server;
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
 
-module.exports = server;
+// Export the server startup function
+if (require.main === module) {
+  startServer();
+} else {
+  module.exports = { app, startServer };
+}

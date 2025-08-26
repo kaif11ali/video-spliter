@@ -643,19 +643,60 @@
       downloadLinks.innerHTML = '';
       
       if (zipPath) {
-        const zipLink = document.createElement('a');
-        zipLink.href = zipPath;
-        zipLink.textContent = '📦 Download All (ZIP)';
-        zipLink.target = '_blank';
-        downloadLinks.appendChild(zipLink);
+        const zipButton = document.createElement('button');
+        zipButton.textContent = '📦 Download All (ZIP)';
+        zipButton.className = 'upload-btn';
+        zipButton.style.marginRight = '1rem';
+        zipButton.style.marginBottom = '0.5rem';
+        zipButton.onclick = async () => {
+          try {
+            zipButton.disabled = true;
+            zipButton.textContent = '⏳ Downloading...';
+            const result = await window.electronAPI.downloadFile(zipPath, 'clips.zip');
+            if (result.success) {
+              statusText.textContent = 'ZIP file downloaded to Downloads folder!';
+              zipButton.textContent = '✅ Downloaded';
+            } else {
+              statusText.textContent = 'Download failed: ' + result.error;
+              zipButton.textContent = '📦 Download All (ZIP)';
+              zipButton.disabled = false;
+            }
+          } catch (error) {
+            statusText.textContent = 'Download failed: ' + error.message;
+            zipButton.textContent = '📦 Download All (ZIP)';
+            zipButton.disabled = false;
+          }
+        };
+        downloadLinks.appendChild(zipButton);
       }
       
       parts.forEach((part, i) => {
-        const link = document.createElement('a');
-        link.href = part.url;
-        link.textContent = `🎬 Part ${i + 1}`;
-        link.target = '_blank';
-        downloadLinks.appendChild(link);
+        const button = document.createElement('button');
+        button.textContent = `🎬 Part ${i + 1}`;
+        button.className = 'upload-btn';
+        button.style.marginRight = '0.5rem';
+        button.style.marginBottom = '0.5rem';
+        button.onclick = async () => {
+          try {
+            const fileName = `part_${String(i + 1).padStart(3, '0')}.mp4`;
+            button.disabled = true;
+            button.textContent = '⏳ Downloading...';
+            const result = await window.electronAPI.downloadFile(part.url, fileName);
+            if (result.success) {
+              statusText.textContent = `Part ${i + 1} downloaded to Downloads folder!`;
+              button.textContent = `✅ Part ${i + 1}`;
+            } else {
+              statusText.textContent = 'Download failed: ' + result.error;
+              button.textContent = `🎬 Part ${i + 1}`;
+              button.disabled = false;
+            }
+          } catch (error) {
+            statusText.textContent = 'Download failed: ' + error.message;
+            button.textContent = `🎬 Part ${i + 1}`;
+            button.disabled = false;
+          }
+        };
+        downloadLinks.appendChild(button);
       });
       
       downloads.classList.remove('hidden');

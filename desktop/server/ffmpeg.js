@@ -43,16 +43,31 @@ async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quali
     if (usableDur <= 1) throw new Error('Usable duration is too short after trimming intro/outro.');
 
     const partsCount = Math.ceil(usableDur / partSec);
-    const outputDir = path.join(path.dirname(inputPath), path.parse(inputPath).name + '_parts');
+    
+    // For desktop files, create output in uploads directory to be accessible via HTTP
+    let outputDir;
+    if (inputPath.includes('uploads')) {
+      // Web upload - create output next to uploaded file
+      outputDir = path.join(path.dirname(inputPath), path.parse(inputPath).name + '_parts');
+    } else {
+      // Desktop file - create output in uploads directory for HTTP access
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      outputDir = path.join(uploadsDir, path.parse(inputPath).name + '_parts');
+    }
+    
     fs.mkdirSync(outputDir, { recursive: true });
 
     const parts = [];
+    
+    // Get the input video name without extension for part naming
+    const inputVideoName = path.parse(inputPath).name;
 
     for (let i = 0; i < partsCount; i++) {
       const partStartFromTrimmed = i * partSec; // within trimmed section
       const absoluteStart = start + partStartFromTrimmed;
       const duration = Math.min(partSec, usableDur - partStartFromTrimmed);
-      const out = path.join(outputDir, `part_${String(i+1).padStart(3, '0')}.mp4`);
+      const out = path.join(outputDir, `${inputVideoName}_part_${String(i+1).padStart(3, '0')}.mp4`);
 
       // Use stream copying for faster processing when possible
       const needsReencoding = (absoluteStart % 1 !== 0) || (duration % 1 !== 0);
@@ -107,25 +122,17 @@ async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quali
 
     setStatus(jobId, 'done');
 
-    // Clean up original uploaded file after successful processing
-    try {
-      fs.unlinkSync(inputPath);
-    } catch (cleanupErr) {
-      console.warn('Could not clean up original file:', cleanupErr.message);
+    // Clean up original uploaded file after successful processing (only if it was uploaded, not desktop file)
+    if (inputPath.includes('uploads')) {
+      try {
+        fs.unlinkSync(inputPath);
+      } catch (cleanupErr) {
+        console.warn('Could not clean up original file:', cleanupErr.message);
+      }
     }
 
-    // Clean up individual part files after creating zip (keep only the zip)
-    try {
-      for (const part of parts) {
-        if (fs.existsSync(part.file)) {
-          fs.unlinkSync(part.file);
-          console.log('Cleaned up part file:', path.basename(part.file));
-        }
-      }
-      console.log('Successfully cleaned up all part files, keeping only the zip');
-    } catch (cleanupErr) {
-      console.warn('Could not clean up part files:', cleanupErr.message);
-    }
+    // Don't clean up individual part files - keep them for individual downloads
+    console.log('Successfully created zip file and kept individual parts for download');
 
     // Schedule cleanup of the entire output directory after 1 hour to give users time to download
     setTimeout(() => {
@@ -142,13 +149,15 @@ async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quali
     console.error('Video processing error:', err);
     setError(jobId, err.message || err);
     
-    // Clean up original uploaded file on error
-    try {
-      if (fs.existsSync(inputPath)) {
-        fs.unlinkSync(inputPath);
+    // Clean up original uploaded file on error (only if it was uploaded, not desktop file)
+    if (inputPath.includes('uploads')) {
+      try {
+        if (fs.existsSync(inputPath)) {
+          fs.unlinkSync(inputPath);
+        }
+      } catch (cleanupErr) {
+        console.warn('Could not clean up original file after error:', cleanupErr.message);
       }
-    } catch (cleanupErr) {
-      console.warn('Could not clean up original file after error:', cleanupErr.message);
     }
   }
 }

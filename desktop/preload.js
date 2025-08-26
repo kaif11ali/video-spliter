@@ -4,5 +4,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectFile: () => ipcRenderer.invoke('select-file'),
   getFileInfo: (filePath) => ipcRenderer.invoke('get-file-info', filePath),
   createFileStream: (filePath) => ipcRenderer.invoke('create-file-stream', filePath),
+  downloadFile: (url, fileName) => ipcRenderer.invoke('download-file', url, fileName),
   openExternal: (url) => ipcRenderer.invoke('open-external', url)
 });
