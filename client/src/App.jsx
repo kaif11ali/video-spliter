@@ -34,7 +34,7 @@ export default function App() {
     e.preventDefault()
     if (!video) return alert('Please choose a video file')
     
-    // Check file size (50GB Call. limit for movies)
+    // Check file size (50GB limit for movies)
     const maxSize = 50 * 1024 * 1024 * 1024; // 50GB in bytes
     if (video.size > maxSize) {
       return alert('File too large! Maximum size is 50GB. Please choose a smaller file.')
