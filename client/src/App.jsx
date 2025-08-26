@@ -176,16 +176,23 @@ export default function App() {
 
         {links.length > 0 && (
           <div style={{marginTop:18}} className="downloads">
-            <h3>Downloads</h3>
-            {zip && <a href={zip} target="_blank">Download all (ZIP)</a>}
-            {links.map((url, i) => (
-              <a key={i} href={url} target="_blank">Part {i+1}</a>
-            ))}
+            <h3>📥 Download Results</h3>
+            {zip && <a href={zip} target="_blank">📦 Download All (ZIP)</a>}
+            {links.length > 0 && (
+              <>
+                <div className="download-section-title">🎬 Individual Parts:</div>
+                <div className="download-buttons-container">
+                  {links.map((url, i) => (
+                    <a key={i} href={url} target="_blank">🎬 Part {i+1}</a>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
         <footer>
-          <strong>Movie Tips:</strong> For 3-hour movies, use 10-15 minute parts (600-900s). 
+          <strong>💡 Movie Tips:</strong> For 3-hour movies, use 10-15 minute parts (600-900s). 
           Supports formats like <strong>600</strong>, <strong>10:00</strong>, or <strong>0:10:00</strong>. 
           Maximum file size: 50GB.
         </footer>
