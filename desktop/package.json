@@ -1,0 +1,56 @@
+{
+  "name": "video-splitter-desktop",
+  "version": "1.0.0",
+  "description": "Desktop Video Splitter Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux",
+    "pack": "electron-builder --dir",
+    "dist": "npm run build"
+  },
+  "keywords": ["video", "splitter", "desktop", "electron"],
+  "author": "Your Name",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.0",
+    "path": "^0.12.7"
+  },
+  "build": {
+    "appId": "com.videosplitter.app",
+    "productName": "Video Splitter",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "server/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

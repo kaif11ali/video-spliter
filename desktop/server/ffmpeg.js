@@ -1,9 +1,9 @@
-import ffmpeg from 'fluent-ffmpeg';
-import fs from 'fs';
-import path from 'path';
-import archiver from 'archiver';
-import { secondsToTimestamp } from './utils.js';
-import { setProgress, setStatus, setParts, setZip, setError } from './progressStore.js';
+const ffmpeg = require('fluent-ffmpeg');
+const fs = require('fs');
+const path = require('path');
+const archiver = require('archiver');
+const { secondsToTimestamp } = require('./utils.js');
+const { setProgress, setStatus, setParts, setZip, setError } = require('./progressStore.js');
 
 // Configure FFmpeg paths
 try {
@@ -16,7 +16,7 @@ try {
   ffmpeg.setFfprobePath(ffprobePath);
 }
 
-export function getDuration(filePath) {
+function getDuration(filePath) {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(filePath, (err, metadata) => {
       if (err) {
@@ -32,7 +32,7 @@ export function getDuration(filePath) {
   });
 }
 
-export async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quality = 'medium', publicBase }) {
+async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quality = 'medium', publicBase }) {
   try {
     setStatus(jobId, 'processing');
 
@@ -166,3 +166,5 @@ function zipFiles(files, zipPath) {
     archive.finalize();
   });
 }
+
+module.exports = { getDuration, splitVideo };

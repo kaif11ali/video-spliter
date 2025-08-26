@@ -1,12 +1,12 @@
-import express from 'express';
-import cors from 'cors';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { nanoid } from 'nanoid';
-import { parseToSeconds } from './utils.js';
-import { initJob, getJob } from './progressStore.js';
-import { splitVideo } from './ffmpeg.js';
+const express = require('express');
+const cors = require('cors');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const { nanoid } = require('nanoid');
+const { parseToSeconds } = require('./utils.js');
+const { initJob, getJob } = require('./progressStore.js');
+const { splitVideo } = require('./ffmpeg.js');
 
 const app = express();
 const PORT = 4000;
@@ -158,4 +158,6 @@ function cleanupOldFiles() {
 
 setInterval(cleanupOldFiles, 30 * 60 * 1000);
 
-app.listen(PORT, () => console.log(`➡️ Server running on http://localhost:${PORT}`));
+const server = app.listen(PORT, () => console.log(`➡️ Server running on http://localhost:${PORT}`));
+
+module.exports = server;

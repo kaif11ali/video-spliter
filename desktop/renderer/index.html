@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Splitter</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 300;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .upload-area {
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    .upload-area:hover {
+      border-color: #4facfe;
+      background: #f8f9ff;
+    }
+
+    .upload-area.dragover {
+      border-color: #4facfe;
+      background: #f0f8ff;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #4facfe;
+    }
+
+    .row {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .progress {
+      background: #f1f3f4;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 8px;
+      margin: 10px 0;
+    }
+
+    .bar {
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .downloads {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .downloads h3 {
+      margin: 0 0 15px 0;
+      color: #333;
+    }
+
+    .downloads a {
+      display: inline-block;
+      margin: 5px 10px 5px 0;
+      padding: 8px 16px;
+      background: #4facfe;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .downloads a:hover {
+      background: #3b9cfe;
+    }
+
+    footer {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .file-info {
+      background: #e8f5e8;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border-left: 4px solid #4caf50;
+    }
+
+    .file-name {
+      font-weight: 500;
+      color: #2e7d32;
+    }
+
+    .file-size {
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎬 Video Splitter</h1>
+    </div>
+    
+    <div class="content">
+      <form id="uploadForm">
+        <div class="upload-area" id="uploadArea">
+          <p>📁 Click here or drag and drop your video file</p>
+          <input type="file" id="videoFile" accept="video/*" style="display: none;">
+        </div>
+        
+        <div id="fileInfo" class="file-info" style="display: none;">
+          <div class="file-name" id="fileName"></div>
+          <div class="file-size" id="fileSize"></div>
+        </div>
+
+        <div class="row">
+          <div class="form-group" style="flex: 1;">
+            <label>Intro to remove (sec or mm:ss or hh:mm:ss)</label>
+            <input type="text" id="intro" placeholder="e.g. 30 or 0:30" value="0">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Outro to remove (sec or mm:ss or hh:mm:ss)</label>
+            <input type="text" id="outro" placeholder="e.g. 60 or 1:00" value="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Clip duration (sec or mm:ss or hh:mm:ss)</label>
+          <input type="text" id="part" placeholder="e.g. 600 or 10:00 or 0:10:00" value="600">
+        </div>
+
+        <div class="form-group">
+          <label>Processing Speed</label>
+          <select id="quality">
+            <option value="fast">Fast (Lower Quality)</option>
+            <option value="medium" selected>Medium (Balanced)</option>
+            <option value="high">High (Best Quality)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <button type="submit" class="btn" id="submitBtn">Split Video</button>
+          <div id="progressContainer" style="flex: 1; display: none;">
+            <div class="progress">
+              <div class="bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <small id="statusText">Ready</small>
+          </div>
+        </div>
+      </form>
+
+      <div id="downloads" class="downloads" style="display: none;">
+        <h3>Downloads</h3>
+        <div id="downloadLinks"></div>
+      </div>
+
+      <footer>
+        <strong>Movie Tips:</strong> For 3-hour movies, use 10-15 minute parts (600-900s). 
+        Supports formats like <strong>600</strong>, <strong>10:00</strong>, or <strong>0:10:00</strong>. 
+        Maximum file size: 50GB.
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:4000';
+    let selectedFile = null;
+    let currentJobId = null;
+    let progressInterval = null;
+
+    // File upload handling
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('videoFile');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const form = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+    const downloads = document.getElementById('downloads');
+    const downloadLinks = document.getElementById('downloadLinks');
+
+    // Drag and drop
+    uploadArea.addEventListener('click', () => {
+      if (window.electronAPI) {
+        selectFileDesktop();
+      } else {
+        fileInput.click();
+      }
+    });
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      
+      if (e.dataTransfer.files.length > 0) {
+        handleFileSelect(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    // Desktop file selection
+    async function selectFileDesktop() {
+      try {
+        const result = await window.electronAPI.selectFile();
+        if (!result.canceled && result.filePaths.length > 0) {
+          const filePath = result.filePaths[0];
+          const stats = require('fs').statSync(filePath);
+          const file = {
+            name: require('path').basename(filePath),
+            size: stats.size,
+            path: filePath
+          };
+          handleFileSelect(file);
+        }
+      } catch (error) {
+        console.error('File selection error:', error);
+      }
+    }
+
+    function handleFileSelect(file) {
+      selectedFile = file;
+      fileName.textContent = file.name;
+      fileSize.textContent = formatFileSize(file.size);
+      fileInfo.style.display = 'block';
+      uploadArea.innerHTML = '<p>✅ File selected: ' + file.name + '</p>';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!selectedFile) {
+        alert('Please select a video file first.');
+        return;
+      }
+
+      const formData = new FormData();
+      
+      // Handle desktop vs web file
+      if (selectedFile.path) {
+        // Desktop: read file from path
+        const fs = require('fs');
+        const fileBuffer = fs.readFileSync(selectedFile.path);
+        const blob = new Blob([fileBuffer]);
+        formData.append('video', blob, selectedFile.name);
+      } else {
+        // Web: use file object directly
+        formData.append('video', selectedFile);
+      }
+      
+      formData.append('intro', document.getElementById('intro').value);
+      formData.append('outro', document.getElementById('outro').value);
+      formData.append('part', document.getElementById('part').value);
+      formData.append('quality', document.getElementById('quality').value);
+
+      try {
+        submitBtn.disabled = true;
+        progressContainer.style.display = 'block';
+        statusText.textContent = 'Uploading...';
+
+        const response = await fetch(`${API}/api/split`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        currentJobId = result.jobId;
+        
+        statusText.textContent = 'Processing...';
+        startProgressTracking();
+
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert('Upload failed: ' + error.message);
+        resetForm();
+      }
+    });
+
+    function startProgressTracking() {
+      if (progressInterval) clearInterval(progressInterval);
+      
+      progressInterval = setInterval(async () => {
+        try {
+          const response = await fetch(`${API}/api/progress/${currentJobId}`);
+          const data = await response.json();
+          
+          progressBar.style.width = data.percent + '%';
+          statusText.textContent = `${data.status} • ${data.percent}%`;
+          
+          if (data.status === 'done') {
+            clearInterval(progressInterval);
+            showDownloads(data.parts, data.zipPath);
+            resetForm();
+          } else if (data.status === 'error') {
+            clearInterval(progressInterval);
+            alert('Processing failed: ' + data.error);
+            resetForm();
+          }
+        } catch (error) {
+          console.error('Progress tracking error:', error);
+        }
+      }, 1000);
+    }
+
+    function showDownloads(parts, zipPath) {
+      downloadLinks.innerHTML = '';
+      
+      if (zipPath) {
+        const zipLink = document.createElement('a');
+        zipLink.href = zipPath;
+        zipLink.textContent = 'Download all (ZIP)';
+        zipLink.target = '_blank';
+        downloadLinks.appendChild(zipLink);
+      }
+      
+      parts.forEach((part, i) => {
+        const link = document.createElement('a');
+        link.href = part.url;
+        link.textContent = `Part ${i + 1}`;
+        link.target = '_blank';
+        downloadLinks.appendChild(link);
+      });
+      
+      downloads.style.display = 'block';
+    }
+
+    function resetForm() {
+      submitBtn.disabled = false;
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+      statusText.textContent = 'Ready';
+    }
+  </script>
+</body>
+</html>
