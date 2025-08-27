@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Splittter - Your Video Portfolio</title>
+    <title>Splittter - Video Splitter Demo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -115,15 +115,8 @@
         margin-bottom: 2rem;
       }
 
-      /* Portfolio Section */
-      .portfolio {
-        padding: 8rem 2rem;
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-
-      /* Upload Section */
-      .upload-section {
+      /* Demo Section */
+      .demo-section {
         padding: 4rem 2rem;
         max-width: 1200px;
         margin: 0 auto;
@@ -222,17 +215,6 @@
         background: #f5f1e8;
       }
 
-      .video-container video::-webkit-media-controls-panel {
-        background: linear-gradient(rgba(139, 92, 46, 0.8), rgba(139, 92, 46, 0.8));
-      }
-
-      /* Video fallback when no video is loaded */
-      .video-container video:empty + .video-placeholder,
-      .video-container video[src=""] + .video-placeholder,
-      .video-container video:not([src]) + .video-placeholder {
-        display: flex;
-      }
-
       .video-placeholder {
         width: 100%;
         height: 100%;
@@ -314,7 +296,7 @@
         transform: scale(1.1);
       }
 
-      /* Instagram */
+      /* Social media hover colors */
       .social-link.instagram:hover {
         background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
       }
@@ -323,7 +305,6 @@
         fill: white;
       }
 
-      /* Facebook */
       .social-link.facebook:hover {
         background: #1877f2;
       }
@@ -332,7 +313,6 @@
         fill: white;
       }
 
-      /* LinkedIn */
       .social-link.linkedin:hover {
         background: #0077b5;
       }
@@ -341,7 +321,6 @@
         fill: white;
       }
 
-      /* GitHub */
       .social-link.github:hover {
         background: #333;
       }
@@ -373,6 +352,29 @@
         }
       }
 
+      /* Action Button */
+      .cta-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #7b5141 0%, #d4a574 50%, #b8956a 100%);
+        color: #ffffff;
+        padding: 1.2rem 2.5rem;
+        border-radius: 15px;
+        font-weight: 700;
+        text-decoration: none;
+        margin-top: 2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 15px 35px rgba(139, 92, 46, 0.25);
+        animation: fadeInUp 1s ease-out 0.8s both;
+      }
+
+      .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 45px rgba(139, 92, 46, 0.35);
+        background: linear-gradient(135deg, #7a4e28 0%, #c29660 50%, #a6845d 100%);
+      }
+
       /* Responsive Design */
       @media (max-width: 768px) {
         .header {
@@ -384,8 +386,8 @@
           min-height: 80vh;
         }
 
-        .portfolio {
-          padding: 4rem 1rem;
+        .demo-section {
+          padding: 3rem 1rem;
         }
 
         .video-grid {
@@ -439,29 +441,6 @@
       ::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(135deg, #7a4e28 0%, #c29660 100%);
       }
-
-      /* Action Button for Future Integration */
-      .cta-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: linear-gradient(135deg, #7b5141 0%, #d4a574 50%, #b8956a 100%);
-        color: #ffffff;
-        padding: 1.2rem 2.5rem;
-        border-radius: 15px;
-        font-weight: 700;
-        text-decoration: none;
-        margin-top: 2rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 15px 35px rgba(139, 92, 46, 0.25);
-        animation: fadeInUp 1s ease-out 0.8s both;
-      }
-
-      .cta-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 20px 45px rgba(139, 92, 46, 0.35);
-        background: linear-gradient(135deg, #7a4e28 0%, #c29660 50%, #a6845d 100%);
-      }
     </style>
   </head>
   <body>
@@ -480,10 +459,10 @@
           <span>Download for Windows</span>
         </a>
       </div>
+      
       <h2 class="portfolio-title">Before & After</h2>
       <div class="video-grid">
         <div class="video-card">
-
           <div class="video-container">
             <video 
               autoplay
@@ -495,7 +474,6 @@
               onloadeddata="this.nextElementSibling.style.display='none'"
               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
               <source src="./videos/before1-video.mp4" type="video/mp4">
-              <source src="./videos/before-video.webm" type="video/webm">
             </video>
             <div class="video-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: rgba(0,0,0,0.1); border-radius: 8px;">
               <span>Original long video will appear here</span>
@@ -517,7 +495,6 @@
               onloadeddata="this.nextElementSibling.style.display='none'"
               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
               <source src="./videos/after-video.mp4" type="video/mp4">
-              <source src="./videos/after-video.webm" type="video/webm">
             </video>
             <div class="video-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: rgba(0,0,0,0.1); border-radius: 8px;">
               <span>Split video clips will appear here</span>
@@ -528,11 +505,10 @@
           </div>
         </div>
       </div>
-    
     </section>
 
-    <!-- Upload/Convert Section (React App) -->
-    <section id="upload" class="upload-section">
+    <!-- Demo Section (React App) -->
+    <section id="demo" class="demo-section">
       <div id="root"></div>
     </section>
 

@@ -15,7 +15,8 @@
     "install:server": "cd server && npm install",
     "install:client": "cd client && npm install",
     "build": "cd client && npm run build",
-    "clean": "rimraf server/uploads/* client/dist server/node_modules client/node_modules"
+    "clean": "rimraf server/uploads/* client/dist desktop/dist static-demo/dist",
+    "clean:deep": "rimraf server/uploads/* client/dist desktop/dist static-demo/dist */node_modules node_modules"
   },
   "keywords": ["video", "splitter", "ffmpeg"],
   "license": "ISC",

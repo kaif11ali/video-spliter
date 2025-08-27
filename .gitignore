@@ -8,6 +8,10 @@ yarn-error.log*
 dist/
 build/
 
+# Upload directories
+uploads/
+*/uploads/
+
 # Environment variables
 .env
 .env.local
