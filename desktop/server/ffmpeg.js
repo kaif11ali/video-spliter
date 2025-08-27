@@ -5,15 +5,26 @@ const archiver = require('archiver');
 const { secondsToTimestamp } = require('./utils.js');
 const { setProgress, setStatus, setParts, setZip, setError } = require('./progressStore.js');
 
-// Configure FFmpeg paths
+// Configure FFmpeg paths using bundled binaries
 try {
-  ffmpeg.setFfmpegPath('ffmpeg');
-  ffmpeg.setFfprobePath('ffprobe');
+  // Try to use bundled static binaries first
+  const ffmpegStatic = require('ffmpeg-static');
+  const ffprobeStatic = require('ffprobe-static');
+  
+  ffmpeg.setFfmpegPath(ffmpegStatic);
+  ffmpeg.setFfprobePath(ffprobeStatic.path);
 } catch (error) {
-  const ffmpegPath = process.env.FFMPEG_PATH || 'C:\\ffmpeg-7.1.1-full_build\\bin\\ffmpeg.exe';
-  const ffprobePath = process.env.FFPROBE_PATH || 'C:\\ffmpeg-7.1.1-full_build\\bin\\ffprobe.exe';
-  ffmpeg.setFfmpegPath(ffmpegPath);
-  ffmpeg.setFfprobePath(ffprobePath);
+  console.log('Static binaries not found, trying system FFmpeg...');
+  try {
+    ffmpeg.setFfmpegPath('ffmpeg');
+    ffmpeg.setFfprobePath('ffprobe');
+  } catch (systemError) {
+    console.log('System FFmpeg not found, trying fallback paths...');
+    const ffmpegPath = process.env.FFMPEG_PATH || 'C:\\ffmpeg-7.1.1-full_build\\bin\\ffmpeg.exe';
+    const ffprobePath = process.env.FFPROBE_PATH || 'C:\\ffmpeg-7.1.1-full_build\\bin\\ffprobe.exe';
+    ffmpeg.setFfmpegPath(ffmpegPath);
+    ffmpeg.setFfprobePath(ffprobePath);
+  }
 }
 
 function getDuration(filePath) {
@@ -21,7 +32,14 @@ function getDuration(filePath) {
     ffmpeg.ffprobe(filePath, (err, metadata) => {
       if (err) {
         console.error('FFprobe error:', err);
-        return reject(new Error('Failed to analyze video file. Please ensure FFmpeg is installed.'));
+        // Provide more specific error message
+        if (err.message && err.message.includes('ENOENT')) {
+          return reject(new Error('FFmpeg not found. Please contact support if this error persists.'));
+        } else if (err.message && err.message.includes('Invalid data')) {
+          return reject(new Error('Invalid or corrupted video file. Please try a different file.'));
+        } else {
+          return reject(new Error('Failed to analyze video file. Please ensure the file is a valid video format.'));
+        }
       }
       const duration = metadata.format?.duration || 0;
       if (duration <= 0) {

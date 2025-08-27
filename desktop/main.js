@@ -136,6 +136,7 @@ ipcMain.handle('download-file', async (event, url, fileName) => {
   try {
     // Get the user's Downloads directory
     const downloadsPath = app.getPath('downloads');
+    console.log('Downloads directory:', downloadsPath);
     
     // For local files served by our server, convert URL to local path and copy to Downloads
     if (url.startsWith('http://localhost:')) {
@@ -143,11 +144,14 @@ ipcMain.handle('download-file', async (event, url, fileName) => {
       const urlParts = url.split('/parts/');
       if (urlParts.length > 1) {
         const relativePath = urlParts[1];
+        console.log('Relative path from URL:', relativePath);
         
         // Try both server/uploads and uploads directories
         const possiblePaths = [
           path.join(__dirname, 'server', 'uploads', relativePath),
-          path.join(__dirname, 'uploads', relativePath)
+          path.join(__dirname, 'uploads', relativePath),
+          path.join(process.cwd(), 'server', 'uploads', relativePath),
+          path.join(process.cwd(), 'uploads', relativePath)
         ];
         
         console.log('Looking for file in possible paths:', possiblePaths);
@@ -179,7 +183,23 @@ ipcMain.handle('download-file', async (event, url, fileName) => {
           }
         }
         
-        console.log('File not found in any expected path');
+        console.log('File not found in any expected path. Available files:');
+        // Debug: List what files are actually in the uploads directory
+        const uploadsDir = path.join(process.cwd(), 'uploads');
+        if (fs.existsSync(uploadsDir)) {
+          const files = fs.readdirSync(uploadsDir, { withFileTypes: true });
+          files.forEach(file => {
+            console.log('  ', file.name, file.isDirectory() ? '(directory)' : '(file)');
+            if (file.isDirectory()) {
+              const subDir = path.join(uploadsDir, file.name);
+              const subFiles = fs.readdirSync(subDir);
+              subFiles.forEach(subFile => {
+                console.log('    ', subFile);
+              });
+            }
+          });
+        }
+        
         return { success: false, error: 'File not found in uploads directory: ' + relativePath };
       }
     }

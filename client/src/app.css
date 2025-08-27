@@ -168,116 +168,32 @@ input[type="file"]:hover {
   border-radius: 16px;
   padding: 2rem;
   border: 1px solid rgba(139, 92, 46, 0.15);
-  margin-top: 2rem;
 }
 
 .downloads h3 {
   color: #3c3530;
-  margin-bottom: 1.5rem;
-  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  font-family: 'Playfair Display', serif;
 }
 
-/* ZIP download button styling */
-.downloads a[href*="zip"] {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 1rem 1rem 0;
-  padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(139, 92, 46, 0.3);
-  min-width: 180px;
-  text-decoration: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.downloads a[href*="zip"]::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
-}
-
-.downloads a[href*="zip"]:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(139, 92, 46, 0.4);
-  background: linear-gradient(135deg, #7a4f26 0%, #c49968 50%, #a6865e 100%);
-}
-
-.downloads a[href*="zip"]:hover::before {
-  left: 100%;
-}
-
-/* Video part buttons styling */
-.downloads a:not([href*="zip"]) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0.5rem 0.5rem 0.5rem 0;
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
+.downloads a {
+  display: inline-block;
+  background: rgba(139, 92, 46, 0.1);
+  color: #8b5c2e;
+  padding: 0.75rem 1.5rem;
   border-radius: 10px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-  min-width: 120px;
   text-decoration: none;
-  position: relative;
-  overflow: hidden;
+  margin: 0.25rem 0.5rem 0.25rem 0;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(139, 92, 46, 0.2);
 }
 
-.downloads a:not([href*="zip"])::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.downloads a:not([href*="zip"]):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-  background: linear-gradient(135deg, #5a6fd8 0%, #6b4d9a 100%);
-}
-
-.downloads a:not([href*="zip"]):hover::before {
-  left: 100%;
-}
-
-/* Download section layout improvements */
-.download-section-title {
-  margin: 1rem 0 0.5rem 0;
-  color: #3c3530;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.download-buttons-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
+.downloads a:hover {
+  background: rgba(139, 92, 46, 0.2);
+  border-color: rgba(139, 92, 46, 0.4);
+  transform: translateY(-1px);
 }
 
 /* Footer */
@@ -353,12 +269,6 @@ footer strong {
   }
 }
 
-@keyframes shimmer {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
 .btn:disabled {
   animation: pulse 2s ease-in-out infinite;
 }
@@ -366,58 +276,4 @@ footer strong {
 /* Smooth Transitions */
 * {
   transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-}
-
-/* Enhanced form styling to match desktop */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-input[type="text"], 
-input[type="file"], 
-select {
-  width: 100%;
-  padding: 0.875rem 1rem;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(139, 92, 46, 0.2);
-  border-radius: 12px;
-  color: #3c3530;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  font-family: inherit;
-}
-
-/* File upload styling enhancement */
-input[type="file"] {
-  background: rgba(255, 255, 255, 0.6);
-  cursor: pointer;
-  border: 2px dashed rgba(139, 92, 46, 0.3);
-  padding: 1rem;
-  text-align: center;
-}
-
-input[type="file"]:hover {
-  border-color: rgba(139, 92, 46, 0.5);
-  background: rgba(255, 255, 255, 0.8);
-  transform: scale(1.01);
-}
-
-/* Upload area styling for consistency */
-.upload-area {
-  border: 2px dashed rgba(139, 92, 46, 0.3);
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 1rem;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(10px);
-}
-
-.upload-area:hover {
-  border-color: rgba(139, 92, 46, 0.5);
-  background: rgba(255, 255, 255, 0.8);
-  transform: scale(1.02);
 }

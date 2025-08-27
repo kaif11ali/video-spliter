@@ -10,17 +10,26 @@
     "build-mac": "electron-builder --mac",
     "build-linux": "electron-builder --linux",
     "pack": "electron-builder --dir",
-    "dist": "npm run build"
+    "dist": "npm run build",
+    "package-win": "electron-packager . \"Video Splitter\" --platform=win32 --arch=x64 --out=dist --overwrite"
   },
-  "keywords": ["video", "splitter", "desktop", "electron"],
+  "keywords": [
+    "video",
+    "splitter",
+    "desktop",
+    "electron"
+  ],
   "author": "Your Name",
   "license": "ISC",
   "devDependencies": {
     "electron": "^32.0.0",
-    "electron-builder": "^25.0.0"
+    "electron-builder": "^25.0.0",
+    "electron-packager": "^17.1.2"
   },
   "dependencies": {
     "electron-store": "^10.0.0",
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0",
     "path": "^0.12.7"
   },
   "build": {
@@ -36,9 +45,15 @@
       "server/**/*",
       "node_modules/**/*"
     ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
+      "target": "portable",
+      "icon": "assets/icon.ico",
+      "sign": null,
+      "verifyUpdateCodeSignature": false
     },
     "mac": {
       "target": "dmg",
@@ -47,10 +62,6 @@
     "linux": {
       "target": "AppImage",
       "icon": "assets/icon.png"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
     }
   }
 }

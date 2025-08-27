@@ -859,13 +859,26 @@
             zipButton.classList.add('downloading');
             zipButton.textContent = '⏳ Downloading...';
             
-            const result = await window.electronAPI.downloadFile(zipPath, 'clips.zip');
+            // Try electron download first
+            let result;
+            try {
+              result = await window.electronAPI.downloadFile(zipPath, 'clips.zip');
+            } catch (electronError) {
+              console.log('Electron download failed, trying alternative method:', electronError);
+              // Fallback: Open the file URL in browser to trigger download
+              await window.electronAPI.openExternal(zipPath);
+              result = { success: true, method: 'browser' };
+            }
             
             // Remove downloading state
             zipButton.classList.remove('downloading');
             
             if (result.success) {
-              statusText.textContent = 'ZIP file downloaded to Downloads folder!';
+              if (result.method === 'browser') {
+                statusText.textContent = 'ZIP file opened in browser for download';
+              } else {
+                statusText.textContent = 'ZIP file downloaded to Downloads folder!';
+              }
               zipButton.textContent = '✅ Downloaded';
               zipButton.classList.add('downloaded');
               zipButton.disabled = false;
@@ -907,13 +920,26 @@
               button.classList.add('downloading');
               button.textContent = '⏳ Downloading...';
               
-              const result = await window.electronAPI.downloadFile(part.url, fileName);
+              // Try electron download first
+              let result;
+              try {
+                result = await window.electronAPI.downloadFile(part.url, fileName);
+              } catch (electronError) {
+                console.log('Electron download failed, trying alternative method:', electronError);
+                // Fallback: Open the file URL in browser to trigger download
+                await window.electronAPI.openExternal(part.url);
+                result = { success: true, method: 'browser' };
+              }
               
               // Remove downloading state
               button.classList.remove('downloading');
               
               if (result.success) {
-                statusText.textContent = `Part ${i + 1} downloaded to Downloads folder!`;
+                if (result.method === 'browser') {
+                  statusText.textContent = `Part ${i + 1} opened in browser for download`;
+                } else {
+                  statusText.textContent = `Part ${i + 1} downloaded to Downloads folder!`;
+                }
                 button.textContent = `✅ Part ${i + 1}`;
                 button.classList.add('downloaded');
                 button.disabled = false;
