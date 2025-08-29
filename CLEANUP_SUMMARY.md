@@ -7,6 +7,8 @@
 - ✅ `/desktop/dist/` - Built desktop application (~336MB)
 - ✅ `/static-demo/dist/` - Built static demo files
 - ✅ `/desktop/uploads/` - Old test upload files
+- ✅ Removed unused `server/chunkedUpload.js` and `desktop/server/chunkedUpload.js`
+- ✅ Removed empty `/landing-page/` directory
 
 ### Cleaned Up Code
 - ✅ Removed commented out HTML sections in `client/index.html`
@@ -23,6 +25,9 @@
   - `/desktop/server` - CommonJS, electron integration, desktop features
 - ✅ **Kept `/static-demo`** - Independent deployment for Vercel
 - ✅ **Kept duplicate videos** - Required for static-demo independence
+
+### Minor Code Simplifications
+- ✅ Deduplicated timeout call in `server/server.js`
 
 ## 📊 Final Stats
 - **Files cleaned**: 46 source files (0.7MB total)

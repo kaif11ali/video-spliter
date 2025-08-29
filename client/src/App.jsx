@@ -9,6 +9,8 @@ export default function App() {
   const [outro, setOutro] = useState('0')
   const [part, setPart] = useState('600') // 10 minutes default for movies
   const [quality, setQuality] = useState('medium') // fast, medium, high
+  const [clipName, setClipName] = useState('')
+  const [zipName, setZipName] = useState('')
   const [jobId, setJobId] = useState(null)
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState('idle')
@@ -56,6 +58,8 @@ export default function App() {
     fd.append('outro', outro)
     fd.append('part', part)
     fd.append('quality', quality)
+    if (clipName.trim()) fd.append('clipName', clipName.trim())
+    if (zipName.trim()) fd.append('zipName', zipName.trim())
 
     // Track upload progress
     const xhr = new XMLHttpRequest()
@@ -159,6 +163,19 @@ export default function App() {
               <option value="medium">Medium (Balanced)</option>
               <option value="high">High (Best Quality)</option>
             </select>
+          </div>
+
+          <div className="grid" style={{marginTop:16}}>
+            <div>
+              <label>Video Clip Name (optional)</label>
+              <input type="text" placeholder="e.g. my_movie_clip" value={clipName} onChange={e=>setClipName(e.target.value)} disabled={disabled} />
+              <small style={{color:'#94a3b8'}}>Default: clip</small>
+            </div>
+            <div>
+              <label>ZIP File Name (optional)</label>
+              <input type="text" placeholder="e.g. my_movie_parts" value={zipName} onChange={e=>setZipName(e.target.value)} disabled={disabled} />
+              <small style={{color:'#94a3b8'}}>Default: output</small>
+            </div>
           </div>
 
           <div className="row" style={{marginTop:18}}>

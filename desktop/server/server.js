@@ -12,6 +12,21 @@ const net = require('net');
 const app = express();
 let PORT = 4000;
 
+// Function to sanitize file names for cross-platform compatibility
+function sanitizeFileName(name) {
+  if (!name || typeof name !== 'string') return 'output';
+  
+  // Remove or replace invalid characters for file names
+  return name
+    .trim()
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_') // Replace invalid chars with underscore
+    .replace(/^\.+/, '') // Remove leading dots
+    .replace(/\.+$/, '') // Remove trailing dots
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .substring(0, 50) // Limit length to 50 characters
+    || 'output'; // Fallback if string becomes empty
+}
+
 // Function to check if port is available
 function isPortAvailable(port) {
   return new Promise((resolve) => {
@@ -149,6 +164,10 @@ app.post('/api/split', (req, res, next) => {
     const outroSec = parseToSeconds(req.body.outro || '0');
     const partSec = parseToSeconds(req.body.part || '180');
     const quality = req.body.quality || 'medium';
+    
+    // Handle custom naming with validation and sanitization
+    const clipName = sanitizeFileName(req.body.clipName || 'clip');
+    const zipName = sanitizeFileName(req.body.zipName || 'output');
 
     if (introSec < 0 || outroSec < 0 || partSec <= 0) {
       // Only delete file if it was uploaded (not desktop file)
@@ -159,9 +178,9 @@ app.post('/api/split', (req, res, next) => {
     }
 
     const publicBase = `${req.protocol}://${req.get('host')}`;
-    console.log('Processing with params:', { introSec, outroSec, partSec, quality });
+    console.log('Processing with params:', { introSec, outroSec, partSec, quality, clipName, zipName });
 
-    splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quality, publicBase });
+    splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quality, publicBase, clipName, zipName });
 
     console.log('Job started with ID:', jobId);
     res.json({ jobId });

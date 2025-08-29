@@ -50,7 +50,7 @@ function getDuration(filePath) {
   });
 }
 
-async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quality = 'medium', publicBase }) {
+async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quality = 'medium', publicBase, clipName = 'clip', zipName = 'output' }) {
   try {
     setStatus(jobId, 'processing');
 
@@ -78,14 +78,14 @@ async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quali
 
     const parts = [];
     
-    // Get the input video name without extension for part naming
-    const inputVideoName = path.parse(inputPath).name;
+    // Use custom clip name or fallback to original video name
+    const videoClipName = clipName || path.parse(inputPath).name || 'clip';
 
     for (let i = 0; i < partsCount; i++) {
       const partStartFromTrimmed = i * partSec; // within trimmed section
       const absoluteStart = start + partStartFromTrimmed;
       const duration = Math.min(partSec, usableDur - partStartFromTrimmed);
-      const out = path.join(outputDir, `${inputVideoName}_part_${String(i+1).padStart(3, '0')}.mp4`);
+      const out = path.join(outputDir, `${videoClipName}_${String(i+1).padStart(3, '0')}.mp4`);
 
       // Use stream copying for faster processing when possible
       const needsReencoding = (absoluteStart % 1 !== 0) || (duration % 1 !== 0);
@@ -132,8 +132,9 @@ async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quali
 
     setParts(jobId, parts);
 
-    // Zip them
-    const zipPath = path.join(outputDir, 'clips.zip');
+    // Create zip with custom name
+    const zipFileName = `${zipName || 'output'}.zip`;
+    const zipPath = path.join(outputDir, zipFileName);
     await zipFiles(parts.map(p => p.file), zipPath);
     const zipUrl = `${publicBase}/parts/${path.basename(outputDir)}/${path.basename(zipPath)}`;
     setZip(jobId, zipUrl);

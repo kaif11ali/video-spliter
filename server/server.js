@@ -8,6 +8,17 @@ import { parseToSeconds } from './utils.js';
 import { initJob, getJob } from './progressStore.js';
 import { splitVideo } from './ffmpeg.js';
 
+function sanitizeFileName(name) {
+  if (!name || typeof name !== 'string') return 'default';
+  return name
+    .replace(/[<>:"/\\|?*]/g, '')  // Remove invalid characters
+    .replace(/\s+/g, '_')          // Replace spaces with underscores
+    .replace(/[^\w\-_.]/g, '')     // Keep only word characters, hyphens, underscores, dots
+    .slice(0, 50)                  // Limit length
+    .replace(/^\.+|\.+$/g, '')     // Remove leading/trailing dots
+    || 'default';                  // Fallback if empty
+}
+
 const app = express();
 const PORT = 4000;
 
@@ -24,8 +35,7 @@ app.use(express.urlencoded({ extended: true, limit: '50gb' }));
 app.use((req, res, next) => {
   if (req.path === '/api/split') {
     req.setTimeout(2 * 60 * 60 * 1000);
-    res.setTimeout(2 * 60 * 60 * 1000);
-    res.setTimeout(2 * 60 * 60 * 1000); // 2 hours
+  res.setTimeout(2 * 60 * 60 * 1000); // 2 hours
   }
   next();
 });
@@ -84,6 +94,8 @@ app.post('/api/split', (req, res, next) => {
     const outroSec = parseToSeconds(req.body.outro || '0');
     const partSec = parseToSeconds(req.body.part || '180');
     const quality = req.body.quality || 'medium';
+    const clipName = sanitizeFileName(req.body.clipName || 'clip');
+    const zipName = sanitizeFileName(req.body.zipName || 'output');
 
     if (introSec < 0 || outroSec < 0 || partSec <= 0) {
       fs.unlinkSync(req.file.path);
@@ -91,9 +103,9 @@ app.post('/api/split', (req, res, next) => {
     }
 
     const publicBase = `${req.protocol}://${req.get('host')}`;
-    console.log('Processing with params:', { introSec, outroSec, partSec, quality });
+    console.log('Processing with params:', { introSec, outroSec, partSec, quality, clipName, zipName });
 
-    splitVideo({ jobId, inputPath: req.file.path, introSec, outroSec, partSec, quality, publicBase });
+    splitVideo({ jobId, inputPath: req.file.path, introSec, outroSec, partSec, quality, publicBase, clipName, zipName });
 
     console.log('Job started with ID:', jobId);
     res.json({ jobId });

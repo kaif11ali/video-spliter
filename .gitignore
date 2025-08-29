@@ -7,6 +7,12 @@ yarn-error.log*
 # Production builds
 dist/
 build/
+build-output/
+video-splitter-build/
+video-splitter-build-final/
+video-splitter-build-v2/
+video-splitter-WORKING/
+outputs/
 
 # Upload directories
 uploads/

@@ -388,6 +388,25 @@
       margin-top: 1rem;
     }
 
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-stage {
+      font-weight: 600;
+      color: #8b5c2e;
+      font-size: 0.9rem;
+    }
+
+    .progress-time {
+      font-size: 0.9rem;
+      color: #6b5b52;
+      font-family: monospace;
+    }
+
     .progress {
       background: rgba(139, 92, 46, 0.1);
       border-radius: 10px;
@@ -406,6 +425,22 @@
       font-size: 0.9rem;
       color: #6b5b52;
       text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      font-size: 0.8rem;
+    }
+
+    .upload-progress, .processing-progress {
+      padding: 0.5rem;
+      background: rgba(139, 92, 46, 0.05);
+      border-radius: 6px;
+      text-align: center;
+      color: #6b5b52;
     }
 
     .downloads {
@@ -460,12 +495,24 @@
     .file-name {
       font-weight: 500;
       color: #3c3530;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .file-details {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
     }
 
     .file-size {
       color: #6b5b52;
       font-size: 0.9rem;
+    }
+
+    .file-duration {
+      color: #8b5c2e;
+      font-size: 0.9rem;
+      font-weight: 500;
     }
 
     .footer {
@@ -481,6 +528,24 @@
 
     .footer strong {
       color: #3c3530;
+    }
+
+    .credit-footer {
+      margin-top: 1rem;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #8b5c2e;
+      background: rgba(139, 92, 46, 0.05);
+      border-radius: 8px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(139, 92, 46, 0.1);
+    }
+
+    .credit-footer .heart {
+      font-size: 25px;
+      margin: 0 4px;
     }
 
     .hidden {
@@ -552,7 +617,10 @@
         
         <div id="fileInfo" class="file-info hidden">
           <div class="file-name" id="fileName"></div>
-          <div class="file-size" id="fileSize"></div>
+          <div class="file-details">
+            <div class="file-size" id="fileSize"></div>
+            <div class="file-duration" id="fileDuration">Analyzing video...</div>
+          </div>
         </div>
 
         <div class="grid">
@@ -571,6 +639,23 @@
           <input type="text" id="part" placeholder="e.g. 600 or 10:00 or 0:10:00" value="600">
         </div>
 
+        <div class="grid">
+          <div class="form-group">
+            <label>🎬 Video Clip Name Prefix</label>
+            <input type="text" id="clipName" placeholder="e.g. MyVideo or Lecture01" value="">
+            <small style="color: #8b8680; font-size: 0.8rem; margin-top: 0.25rem; display: block;">
+              Clips will be named: ClipName_001.mp4, ClipName_002.mp4, etc.
+            </small>
+          </div>
+          <div class="form-group">
+            <label>📦 ZIP File Name</label>
+            <input type="text" id="zipName" placeholder="e.g. MyProject or VideoSplit" value="">
+            <small style="color: #8b8680; font-size: 0.8rem; margin-top: 0.25rem; display: block;">
+              Final archive will be named: YourName.zip
+            </small>
+          </div>
+        </div>
+
         <div class="form-group">
           <label>Processing Quality</label>
           <select id="quality">
@@ -583,10 +668,18 @@
         <div class="action-buttons">
           <button type="submit" class="btn" id="submitBtn">Split Video</button>
           <div id="progressContainer" class="progress-container hidden">
+            <div class="progress-info">
+              <div class="progress-stage" id="progressStage">Upload</div>
+              <div class="progress-time" id="progressTime">0:00</div>
+            </div>
             <div class="progress">
               <div class="bar" id="progressBar" style="width: 0%"></div>
             </div>
             <div class="status-text" id="statusText">Ready</div>
+            <div class="progress-details">
+              <div class="upload-progress" id="uploadProgress">Upload: 0%</div>
+              <div class="processing-progress" id="processingProgress">Processing: 0%</div>
+            </div>
           </div>
         </div>
       </form>
@@ -601,6 +694,10 @@
         Supports formats like <strong>600</strong>, <strong>10:00</strong>, or <strong>0:10:00</strong>. 
         Maximum file size: 50GB.
       </div>
+      
+      <div class="credit-footer">
+        MADE BY <span class="heart">♥</span> KAIFALI
+      </div>
     </div>
   </div>
 
@@ -609,6 +706,8 @@
     let selectedFile = null;
     let currentJobId = null;
     let progressInterval = null;
+    let startTime = null;
+    let timerInterval = null;
 
     // Get DOM elements
     const uploadArea = document.getElementById('uploadArea');
@@ -617,13 +716,108 @@
     const fileInfo = document.getElementById('fileInfo');
     const fileName = document.getElementById('fileName');
     const fileSize = document.getElementById('fileSize');
+    const fileDuration = document.getElementById('fileDuration');
     const form = document.getElementById('uploadForm');
     const submitBtn = document.getElementById('submitBtn');
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
     const statusText = document.getElementById('statusText');
+    const progressStage = document.getElementById('progressStage');
+    const progressTime = document.getElementById('progressTime');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const processingProgress = document.getElementById('processingProgress');
     const downloads = document.getElementById('downloads');
     const downloadLinks = document.getElementById('downloadLinks');
+
+    // Utility functions
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function formatDuration(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+      
+      if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+      return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        progressTime.textContent = formatTime(elapsed);
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    async function getVideoDuration(file) {
+      try {
+        fileDuration.textContent = 'Analyzing video...';
+        
+        if (window.electronAPI && file.path) {
+          // Desktop: Use backend to get duration
+          const response = await fetch(`${API}/api/video-info`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath: file.path })
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.duration) {
+              fileDuration.textContent = `Duration: ${formatDuration(data.duration)}`;
+            } else {
+              fileDuration.textContent = 'Duration: Unable to analyze';
+            }
+          } else {
+            fileDuration.textContent = 'Duration: Analysis failed';
+          }
+        } else {
+          // Web: Use HTML5 video element
+          const video = document.createElement('video');
+          video.preload = 'metadata';
+          
+          video.onloadedmetadata = () => {
+            if (video.duration && !isNaN(video.duration)) {
+              fileDuration.textContent = `Duration: ${formatDuration(video.duration)}`;
+            } else {
+              fileDuration.textContent = 'Duration: Unable to analyze';
+            }
+            URL.revokeObjectURL(video.src);
+          };
+          
+          video.onerror = () => {
+            fileDuration.textContent = 'Duration: Analysis failed';
+            URL.revokeObjectURL(video.src);
+          };
+          
+          video.src = URL.createObjectURL(file);
+        }
+      } catch (error) {
+        console.error('Duration analysis error:', error);
+        fileDuration.textContent = 'Duration: Analysis failed';
+      }
+    }
 
     // File selection via button
     selectBtn.addEventListener('click', (e) => {
@@ -722,6 +916,9 @@
       
       fileInfo.classList.remove('hidden');
       
+      // Get video duration
+      getVideoDuration(file);
+      
       // Update upload area to show selected file
       uploadArea.innerHTML = `
         <div class="upload-icon">✅</div>
@@ -761,6 +958,14 @@
         return;
       }
 
+      // Validate clip duration is required
+      const partValue = document.getElementById('part').value.trim();
+      if (!partValue || partValue === '0') {
+        alert('Clip duration is required! Please enter a valid duration (e.g. 600 or 10:00).');
+        document.getElementById('part').focus();
+        return;
+      }
+
       const formData = new FormData();
       
       // Handle desktop vs web file
@@ -791,6 +996,8 @@
       formData.append('outro', document.getElementById('outro').value);
       formData.append('part', document.getElementById('part').value);
       formData.append('quality', document.getElementById('quality').value);
+      formData.append('clipName', document.getElementById('clipName').value);
+      formData.append('zipName', document.getElementById('zipName').value);
 
       try {
         submitBtn.disabled = true;
