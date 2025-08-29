@@ -51,10 +51,13 @@
       "allowToChangeInstallationDirectory": true
     },
     "win": {
-      "target": "portable",
-      "icon": "assets/icons/icon.ico",
-      "sign": null,
-      "verifyUpdateCodeSignature": false
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icons/icon.ico"
     },
     "mac": {
       "target": "dmg",

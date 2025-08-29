@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -155,12 +155,13 @@ ipcMain.handle('download-file', async (event, url, fileName) => {
         const relativePath = urlParts[1];
         console.log('Relative path from URL:', relativePath);
         
-        // Try both server/uploads and uploads directories
+        // Try both desktop/uploads and desktop/server/uploads directories
         const possiblePaths = [
-          path.join(__dirname, 'server', 'uploads', relativePath),
           path.join(__dirname, 'uploads', relativePath),
-          path.join(process.cwd(), 'server', 'uploads', relativePath),
-          path.join(process.cwd(), 'uploads', relativePath)
+          path.join(__dirname, 'server', 'uploads', relativePath),
+          path.join(process.cwd(), 'uploads', relativePath),
+          path.join(process.cwd(), 'desktop', 'uploads', relativePath),
+          path.join(process.cwd(), 'desktop', 'server', 'uploads', relativePath)
         ];
         
         console.log('Looking for file in possible paths:', possiblePaths);
@@ -193,20 +194,38 @@ ipcMain.handle('download-file', async (event, url, fileName) => {
         }
         
         console.log('File not found in any expected path. Available files:');
-        // Debug: List what files are actually in the uploads directory
-        const uploadsDir = path.join(process.cwd(), 'uploads');
-        if (fs.existsSync(uploadsDir)) {
-          const files = fs.readdirSync(uploadsDir, { withFileTypes: true });
-          files.forEach(file => {
-            console.log('  ', file.name, file.isDirectory() ? '(directory)' : '(file)');
-            if (file.isDirectory()) {
-              const subDir = path.join(uploadsDir, file.name);
-              const subFiles = fs.readdirSync(subDir);
-              subFiles.forEach(subFile => {
-                console.log('    ', subFile);
+        // Debug: List what files are actually in the uploads directories
+        const uploadsDirs = [
+          path.join(__dirname, 'uploads'),
+          path.join(__dirname, 'server', 'uploads'),
+          path.join(process.cwd(), 'uploads'),
+          path.join(process.cwd(), 'desktop', 'uploads'),
+          path.join(process.cwd(), 'desktop', 'server', 'uploads')
+        ];
+        
+        for (const uploadsDir of uploadsDirs) {
+          if (fs.existsSync(uploadsDir)) {
+            console.log(`Files in ${uploadsDir}:`);
+            try {
+              const files = fs.readdirSync(uploadsDir, { withFileTypes: true });
+              files.forEach(file => {
+                console.log('  ', file.name, file.isDirectory() ? '(directory)' : '(file)');
+                if (file.isDirectory()) {
+                  const subDir = path.join(uploadsDir, file.name);
+                  try {
+                    const subFiles = fs.readdirSync(subDir);
+                    subFiles.forEach(subFile => {
+                      console.log('    ', subFile);
+                    });
+                  } catch (e) {
+                    console.log('    Error reading subdirectory:', e.message);
+                  }
+                }
               });
+            } catch (e) {
+              console.log('  Error reading directory:', e.message);
             }
-          });
+          }
         }
         
         return { success: false, error: 'File not found in uploads directory: ' + relativePath };
