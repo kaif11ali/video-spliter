@@ -68,15 +68,27 @@
       margin-bottom: 2.5rem;
     }
 
+    .header .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .header .logo-container img {
+      width: 110px;
+      height: 110px;
+      margin-top: 5px;
+      margin-right: -20px;
+      object-fit: contain;
+    }
+
     .header h1 {
       font-family: 'Playfair Display', serif;
       font-size: 2.5rem;
       font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      margin: 0;
+  color: #815744;
       letter-spacing: -0.02em;
     }
 
@@ -597,7 +609,10 @@
   <div class="container">
     <div class="card">
       <div class="header">
-        <h1>🎬Splittter</h1>
+        <div class="logo-container">
+          <img src="../assets/icons/splittterlogo.png" alt="Splittter Logo">
+          <h1>Splittter</h1>
+        </div>
         <p class="muted">Transform your videos with precision and elegance</p>
       </div>
       
