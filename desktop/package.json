@@ -43,6 +43,7 @@
       "preload.js",
       "renderer/**/*",
       "server/**/*",
+      "assets/**/*",
       "node_modules/**/*"
     ],
     "nsis": {
@@ -51,17 +52,17 @@
     },
     "win": {
       "target": "portable",
-      "icon": "assets/icon.ico",
+      "icon": "assets/icons/icon.ico",
       "sign": null,
       "verifyUpdateCodeSignature": false
     },
     "mac": {
       "target": "dmg",
-      "icon": "assets/icon.icns"
+      "icon": "assets/icons/app-icon.png"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "assets/icon.png"
+      "icon": "assets/icons/app-icon.png"
     }
   }
 }

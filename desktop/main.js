@@ -11,6 +11,7 @@ function createWindow() {
     height: 900,
     minWidth: 600,
     minHeight: 700,
+    icon: path.join(__dirname, 'assets', 'icons', 'app-icon.png'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -57,7 +58,15 @@ function startBackendServer() {
     // Start server with dynamic port
     startServer().then(server => {
       serverInstance = server;
+      const serverPort = server.address().port;
       console.log('Backend server started successfully');
+      
+      // Send the port to the renderer process when it's ready
+      if (mainWindow && mainWindow.webContents) {
+        mainWindow.webContents.once('dom-ready', () => {
+          mainWindow.webContents.send('server-port', serverPort);
+        });
+      }
     }).catch(error => {
       console.error('Failed to start backend server:', error);
     });

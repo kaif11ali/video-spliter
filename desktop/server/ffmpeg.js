@@ -172,7 +172,7 @@ async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quali
     // Don't clean up individual part files - keep them for individual downloads
     console.log('Successfully created zip file and kept individual parts for download');
 
-    // Schedule cleanup of the entire output directory after 1 hour to give users time to download
+    // Schedule cleanup of the entire output directory after 30 minutes to give users time to download
     setTimeout(() => {
       try {
         if (fs.existsSync(outputDir)) {
@@ -182,7 +182,7 @@ async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec, quali
       } catch (cleanupErr) {
         console.warn('Could not clean up output directory:', cleanupErr.message);
       }
-    }, 60 * 60 * 1000); // 1 hour delay
+    }, 30 * 60 * 1000); // 30 minutes delay
   } catch (err) {
     console.error('Video processing error:', err);
     setError(jobId, err.message || err);

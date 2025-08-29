@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Video Splitter</title>
+  <link rel="icon" type="image/x-icon" href="../assets/icons/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="../assets/icons/favicon.ico">
+  <link rel="apple-touch-icon" href="../assets/icons/app-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -706,10 +709,44 @@
   </div>
 
   <script>
-    const API = 'http://localhost:4003';
+    let API = 'http://localhost:4000'; // Default fallback
     let selectedFile = null;
     let currentJobId = null;
     let progressInterval = null;
+
+    // Listen for server port from main process
+    if (window.electronAPI && window.electronAPI.onServerPort) {
+      window.electronAPI.onServerPort((event, port) => {
+        API = `http://localhost:${port}`;
+        console.log('Server API set to:', API);
+      });
+    }
+
+    // Fallback: try to detect server port by testing common ports
+    async function detectServerPort() {
+      const ports = [4000, 4001, 4002, 4003, 4004, 4005];
+      for (const port of ports) {
+        try {
+          const response = await fetch(`http://localhost:${port}/api/progress/test`, { 
+            method: 'GET',
+            signal: AbortSignal.timeout(1000)
+          });
+          if (response.status === 404) { // 404 means server is running but job not found - that's good
+            API = `http://localhost:${port}`;
+            console.log('Server port auto-detected:', port);
+            break;
+          }
+        } catch (error) {
+          // Port not available, continue to next
+          continue;
+        }
+      }
+    }
+
+    // Run port detection on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(detectServerPort, 500); // Give some time for the port message to arrive
+    });
 
     // Get DOM elements
     const uploadArea = document.getElementById('uploadArea');

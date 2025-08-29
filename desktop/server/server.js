@@ -245,8 +245,8 @@ function cleanupOldFiles() {
     const itemPath = path.join(uploadsPath, item);
     const stats = fs.statSync(itemPath);
     
-    const oneHourAgo = Date.now() - (60 * 60 * 1000);
-    if (stats.mtime.getTime() < oneHourAgo) {
+    const thirtyMinutesAgo = Date.now() - (30 * 60 * 1000); // Changed from 1 hour to 30 minutes
+    if (stats.mtime.getTime() < thirtyMinutesAgo) {
       try {
         if (stats.isDirectory()) {
           fs.rmSync(itemPath, { recursive: true, force: true });
@@ -264,7 +264,7 @@ function cleanupOldFiles() {
   console.log(`Cleanup completed. Removed ${cleanedCount} items.`);
 }
 
-setInterval(cleanupOldFiles, 30 * 60 * 1000);
+setInterval(cleanupOldFiles, 15 * 60 * 1000); // Run cleanup every 15 minutes
 
 // Start server with dynamic port finding
 async function startServer() {
