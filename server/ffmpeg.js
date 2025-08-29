@@ -56,13 +56,20 @@ export async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec
       const out = path.join(outputDir, `${clipName}_${String(i+1).padStart(3, '0')}.mp4`);
 
       // Use stream copying for faster processing when possible
-      const needsReencoding = (absoluteStart % 1 !== 0) || (duration % 1 !== 0);
+      // Round to nearest keyframe for better stream copy compatibility
+      const keyframeStart = Math.round(absoluteStart);
+      const keyframeDuration = Math.round(duration);
+      // Only reencode if we need precise cuts or format conversion
+      const needsReencoding = Math.abs(absoluteStart - keyframeStart) > 2 || 
+                             Math.abs(duration - keyframeDuration) > 2;
       
-      // Quality presets
+      console.log(`Processing part ${i+1}/${partsCount}, ${needsReencoding ? 'reencoding' : 'stream copying'}, duration: ${duration}s`);
+      
+      // Quality presets optimized for speed while maintaining quality
       const qualitySettings = {
         fast: { preset: 'ultrafast', crf: 28 },
-        medium: { preset: 'medium', crf: 23 },
-        high: { preset: 'slow', crf: 18 }
+        medium: { preset: 'fast', crf: 23 },      
+        high: { preset: 'fast', crf: 18 }         // Changed from 'medium' to 'fast' for speed
       };
       
       await new Promise((resolve, reject) => {
@@ -77,7 +84,10 @@ export async function splitVideo({ jobId, inputPath, introSec, outroSec, partSec
             `-preset ${settings.preset}`,
             `-crf ${settings.crf}`,
             '-c:a aac', 
-            '-movflags +faststart'
+            '-movflags +faststart',
+            '-threads 0',                 // Use all available CPU threads
+            '-tune zerolatency',          // Optimize for speed
+            '-x264-params keyint=30:min-keyint=15'  // Optimize keyframes for faster seeking
           ]);
         } else {
           command.outputOptions([

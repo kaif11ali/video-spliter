@@ -168,6 +168,22 @@ app.post('/api/split', (req, res, next) => {
     // Handle custom naming with validation and sanitization
     const clipName = sanitizeFileName(req.body.clipName || 'clip');
     const zipName = sanitizeFileName(req.body.zipName || 'output');
+    
+    console.log('Debug - Received form data:', {
+      clipNameRaw: req.body.clipName,
+      zipNameRaw: req.body.zipName,
+      clipNameSanitized: clipName,
+      zipNameSanitized: zipName
+    });
+
+    // Enhanced validation
+    if (!req.body.part || req.body.part.trim() === '') {
+      // Only delete file if it was uploaded (not desktop file)
+      if (req.file && req.file.path) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(400).json({ error: 'Clip duration is required. Please specify how long each video part should be.' });
+    }
 
     if (introSec < 0 || outroSec < 0 || partSec <= 0) {
       // Only delete file if it was uploaded (not desktop file)
@@ -175,6 +191,10 @@ app.post('/api/split', (req, res, next) => {
         fs.unlinkSync(req.file.path);
       }
       return res.status(400).json({ error: 'Invalid time values. All values must be positive, and part duration must be greater than 0.' });
+    }
+
+    if (partSec > 3600) {
+      console.log('Warning: Large clip duration requested:', partSec, 'seconds');
     }
 
     const publicBase = `${req.protocol}://${req.get('host')}`;

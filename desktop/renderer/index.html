@@ -14,13 +14,29 @@
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #f7f3e9 0%, #ede4d3 30%, #e8dcc6 70%, #f2e9d8 100%);
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
       color: #2d2926;
       min-height: 100vh;
       overflow-x: hidden;
       padding: 0;
+      position: relative;
+    }
+
+    /* Prevent layout shifts and improve performance */
+    * {
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      -webkit-perspective: 1000;
+      perspective: 1000;  
     }
 
     .container {
@@ -37,11 +53,14 @@
       backdrop-filter: blur(20px);
       box-shadow: 0 25px 50px rgba(139, 92, 46, 0.1);
       transition: all 0.3s ease;
+      transform: translateZ(0);
+      will-change: transform;
     }
 
     .card:hover {
       border-color: rgba(139, 92, 46, 0.3);
       box-shadow: 0 30px 60px rgba(139, 92, 46, 0.15);
+      transform: translateZ(0) translateY(-2px);
     }
 
     .header {
@@ -82,17 +101,20 @@
       margin-bottom: 1rem;
       background: rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(10px);
+      transform: translateZ(0);
+      will-change: transform, background-color, border-color;
     }
 
     .upload-area:hover {
       border-color: rgba(139, 92, 46, 0.5);
       background: rgba(255, 255, 255, 0.8);
+      transform: translateZ(0);
     }
 
     .upload-area.dragover {
       border-color: rgba(139, 92, 46, 0.7);
       background: rgba(255, 255, 255, 0.9);
-      transform: scale(1.02);
+      transform: translateZ(0) scale(1.02);
     }
 
     .upload-icon {
@@ -179,6 +201,26 @@
       background: rgba(255, 255, 255, 0.9);
     }
 
+    /* Required field styling */
+    input[required] {
+      border-left: 3px solid #e74c3c;
+    }
+
+    input[required]:valid {
+      border-left: 3px solid #27ae60;
+    }
+
+    input[required]:invalid {
+      border-left: 3px solid #e74c3c;
+    }
+
+    /* Error state for validation */
+    input.error {
+      border-color: #e74c3c !important;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
+      background: rgba(255, 243, 243, 0.9) !important;
+    }
+
     .btn {
       background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
       color: white;
@@ -191,17 +233,19 @@
       transition: all 0.3s ease;
       font-family: inherit;
       box-shadow: 0 4px 15px rgba(139, 92, 46, 0.2);
+      transform: translateZ(0);
+      will-change: transform, box-shadow;
     }
 
     .btn:hover {
-      transform: translateY(-2px);
+      transform: translateZ(0) translateY(-2px);
       box-shadow: 0 8px 25px rgba(139, 92, 46, 0.3);
     }
 
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
+      transform: translateZ(0);
       box-shadow: 0 4px 15px rgba(139, 92, 46, 0.1);
     }
 
@@ -388,25 +432,6 @@
       margin-top: 1rem;
     }
 
-    .progress-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .progress-stage {
-      font-weight: 600;
-      color: #8b5c2e;
-      font-size: 0.9rem;
-    }
-
-    .progress-time {
-      font-size: 0.9rem;
-      color: #6b5b52;
-      font-family: monospace;
-    }
-
     .progress {
       background: rgba(139, 92, 46, 0.1);
       border-radius: 10px;
@@ -425,22 +450,6 @@
       font-size: 0.9rem;
       color: #6b5b52;
       text-align: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .progress-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      font-size: 0.8rem;
-    }
-
-    .upload-progress, .processing-progress {
-      padding: 0.5rem;
-      background: rgba(139, 92, 46, 0.05);
-      border-radius: 6px;
-      text-align: center;
-      color: #6b5b52;
     }
 
     .downloads {
@@ -495,24 +504,12 @@
     .file-name {
       font-weight: 500;
       color: #3c3530;
-      margin-bottom: 0.5rem;
-    }
-
-    .file-details {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
+      margin-bottom: 0.2rem;
     }
 
     .file-size {
       color: #6b5b52;
       font-size: 0.9rem;
-    }
-
-    .file-duration {
-      color: #8b5c2e;
-      font-size: 0.9rem;
-      font-weight: 500;
     }
 
     .footer {
@@ -617,10 +614,7 @@
         
         <div id="fileInfo" class="file-info hidden">
           <div class="file-name" id="fileName"></div>
-          <div class="file-details">
-            <div class="file-size" id="fileSize"></div>
-            <div class="file-duration" id="fileDuration">Analyzing video...</div>
-          </div>
+          <div class="file-size" id="fileSize"></div>
         </div>
 
         <div class="grid">
@@ -635,8 +629,11 @@
         </div>
 
         <div class="form-group">
-          <label>Clip duration (sec or mm:ss or hh:mm:ss)</label>
-          <input type="text" id="part" placeholder="e.g. 600 or 10:00 or 0:10:00" value="600">
+          <label>Clip duration (sec or mm:ss or hh:mm:ss) <span style="color: #e74c3c;">*</span></label>
+          <input type="text" id="part" placeholder="e.g. 600 or 10:00 or 0:10:00" value="600" required>
+          <small style="color: #8b8680; font-size: 0.8rem; margin-top: 0.25rem; display: block;">
+            <strong>Required:</strong> How long each video part should be
+          </small>
         </div>
 
         <div class="grid">
@@ -668,18 +665,10 @@
         <div class="action-buttons">
           <button type="submit" class="btn" id="submitBtn">Split Video</button>
           <div id="progressContainer" class="progress-container hidden">
-            <div class="progress-info">
-              <div class="progress-stage" id="progressStage">Upload</div>
-              <div class="progress-time" id="progressTime">0:00</div>
-            </div>
             <div class="progress">
               <div class="bar" id="progressBar" style="width: 0%"></div>
             </div>
             <div class="status-text" id="statusText">Ready</div>
-            <div class="progress-details">
-              <div class="upload-progress" id="uploadProgress">Upload: 0%</div>
-              <div class="processing-progress" id="processingProgress">Processing: 0%</div>
-            </div>
           </div>
         </div>
       </form>
@@ -702,12 +691,10 @@
   </div>
 
   <script>
-    const API = 'http://localhost:4000';
+    const API = 'http://localhost:4003';
     let selectedFile = null;
     let currentJobId = null;
     let progressInterval = null;
-    let startTime = null;
-    let timerInterval = null;
 
     // Get DOM elements
     const uploadArea = document.getElementById('uploadArea');
@@ -716,108 +703,57 @@
     const fileInfo = document.getElementById('fileInfo');
     const fileName = document.getElementById('fileName');
     const fileSize = document.getElementById('fileSize');
-    const fileDuration = document.getElementById('fileDuration');
     const form = document.getElementById('uploadForm');
     const submitBtn = document.getElementById('submitBtn');
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
     const statusText = document.getElementById('statusText');
-    const progressStage = document.getElementById('progressStage');
-    const progressTime = document.getElementById('progressTime');
-    const uploadProgress = document.getElementById('uploadProgress');
-    const processingProgress = document.getElementById('processingProgress');
     const downloads = document.getElementById('downloads');
     const downloadLinks = document.getElementById('downloadLinks');
 
-    // Utility functions
-    function formatFileSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-    function formatDuration(seconds) {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = Math.floor(seconds % 60);
+    // Real-time validation for clip duration field
+    const partInput = document.getElementById('part');
+    partInput.addEventListener('input', function() {
+      const value = this.value.trim();
+      const durationRegex = /^(\d+)$|^(\d{1,2}):(\d{2})$|^(\d{1,2}):(\d{2}):(\d{2})$/;
       
-      if (hours > 0) {
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      if (value === '') {
+        this.classList.add('error');
+        this.setCustomValidity('Clip duration is required');
+      } else if (!durationRegex.test(value)) {
+        this.classList.add('error');
+        this.setCustomValidity('Invalid format. Use: 600 or 10:00 or 0:10:00');
+      } else {
+        this.classList.remove('error');
+        this.setCustomValidity('');
       }
-      return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    }
+    });
 
-    function formatTime(seconds) {
-      const minutes = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function startTimer() {
-      startTime = Date.now();
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        progressTime.textContent = formatTime(elapsed);
-      }, 1000);
-    }
-
-    function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-    }
-
-    async function getVideoDuration(file) {
-      try {
-        fileDuration.textContent = 'Analyzing video...';
-        
-        if (window.electronAPI && file.path) {
-          // Desktop: Use backend to get duration
-          const response = await fetch(`${API}/api/video-info`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filePath: file.path })
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            if (data.duration) {
-              fileDuration.textContent = `Duration: ${formatDuration(data.duration)}`;
-            } else {
-              fileDuration.textContent = 'Duration: Unable to analyze';
-            }
-          } else {
-            fileDuration.textContent = 'Duration: Analysis failed';
-          }
-        } else {
-          // Web: Use HTML5 video element
-          const video = document.createElement('video');
-          video.preload = 'metadata';
-          
-          video.onloadedmetadata = () => {
-            if (video.duration && !isNaN(video.duration)) {
-              fileDuration.textContent = `Duration: ${formatDuration(video.duration)}`;
-            } else {
-              fileDuration.textContent = 'Duration: Unable to analyze';
-            }
-            URL.revokeObjectURL(video.src);
-          };
-          
-          video.onerror = () => {
-            fileDuration.textContent = 'Duration: Analysis failed';
-            URL.revokeObjectURL(video.src);
-          };
-          
-          video.src = URL.createObjectURL(file);
+    partInput.addEventListener('blur', function() {
+      // Additional validation on blur
+      const value = this.value.trim();
+      if (value && /^(\d+)$|^(\d{1,2}):(\d{2})$|^(\d{1,2}):(\d{2}):(\d{2})$/.test(value)) {
+        // Convert to seconds for range validation
+        let seconds = 0;
+        if (/^\d+$/.test(value)) {
+          seconds = parseInt(value);
+        } else if (/^\d{1,2}:\d{2}$/.test(value)) {
+          const [m, s] = value.split(':').map(Number);
+          seconds = m * 60 + s;
+        } else if (/^\d{1,2}:\d{2}:\d{2}$/.test(value)) {
+          const [h, m, s] = value.split(':').map(Number);
+          seconds = h * 3600 + m * 60 + s;
         }
-      } catch (error) {
-        console.error('Duration analysis error:', error);
-        fileDuration.textContent = 'Duration: Analysis failed';
+        
+        if (seconds <= 0) {
+          this.classList.add('error');
+          this.setCustomValidity('Duration must be greater than 0');
+        } else {
+          this.classList.remove('error');
+          this.setCustomValidity('');
+        }
       }
-    }
+    });
 
     // File selection via button
     selectBtn.addEventListener('click', (e) => {
@@ -916,9 +852,6 @@
       
       fileInfo.classList.remove('hidden');
       
-      // Get video duration
-      getVideoDuration(file);
-      
       // Update upload area to show selected file
       uploadArea.innerHTML = `
         <div class="upload-icon">✅</div>
@@ -958,12 +891,49 @@
         return;
       }
 
-      // Validate clip duration is required
-      const partValue = document.getElementById('part').value.trim();
-      if (!partValue || partValue === '0') {
-        alert('Clip duration is required! Please enter a valid duration (e.g. 600 or 10:00).');
+      // Validate required fields
+      const clipDuration = document.getElementById('part').value.trim();
+      if (!clipDuration) {
+        alert('⚠️ Clip duration is required!\n\nPlease enter the duration for each video part.\nExample: 600 (seconds) or 10:00 (mm:ss) or 0:10:00 (hh:mm:ss)');
         document.getElementById('part').focus();
         return;
+      }
+
+      // Validate clip duration format and value
+      const durationRegex = /^(\d+)$|^(\d{1,2}):(\d{2})$|^(\d{1,2}):(\d{2}):(\d{2})$/;
+      if (!durationRegex.test(clipDuration)) {
+        alert('⚠️ Invalid clip duration format!\n\nPlease use one of these formats:\n• Seconds: 600\n• Minutes:Seconds: 10:00\n• Hours:Minutes:Seconds: 0:10:00');
+        document.getElementById('part').focus();
+        return;
+      }
+
+      // Convert duration to seconds for validation
+      let durationInSeconds = 0;
+      if (/^\d+$/.test(clipDuration)) {
+        // Just seconds
+        durationInSeconds = parseInt(clipDuration);
+      } else if (/^\d{1,2}:\d{2}$/.test(clipDuration)) {
+        // mm:ss format
+        const [minutes, seconds] = clipDuration.split(':').map(Number);
+        durationInSeconds = minutes * 60 + seconds;
+      } else if (/^\d{1,2}:\d{2}:\d{2}$/.test(clipDuration)) {
+        // hh:mm:ss format
+        const [hours, minutes, seconds] = clipDuration.split(':').map(Number);
+        durationInSeconds = hours * 3600 + minutes * 60 + seconds;
+      }
+
+      if (durationInSeconds <= 0) {
+        alert('⚠️ Clip duration must be greater than 0!\n\nPlease enter a valid duration greater than 0 seconds.');
+        document.getElementById('part').focus();
+        return;
+      }
+
+      if (durationInSeconds > 3600) { // More than 1 hour
+        const proceed = confirm('⚠️ Long clip duration detected!\n\nYou entered a clip duration of more than 1 hour. This will create very large video files.\n\nAre you sure you want to continue?');
+        if (!proceed) {
+          document.getElementById('part').focus();
+          return;
+        }
       }
 
       const formData = new FormData();
@@ -1066,10 +1036,13 @@
             zipButton.classList.add('downloading');
             zipButton.textContent = '⏳ Downloading...';
             
+            // Extract the actual filename from the zip path
+            const zipFileName = zipPath.split('/').pop(); // Get the last part of the URL path
+            
             // Try electron download first
             let result;
             try {
-              result = await window.electronAPI.downloadFile(zipPath, 'clips.zip');
+              result = await window.electronAPI.downloadFile(zipPath, zipFileName);
             } catch (electronError) {
               console.log('Electron download failed, trying alternative method:', electronError);
               // Fallback: Open the file URL in browser to trigger download

@@ -97,6 +97,12 @@ app.post('/api/split', (req, res, next) => {
     const clipName = sanitizeFileName(req.body.clipName || 'clip');
     const zipName = sanitizeFileName(req.body.zipName || 'output');
 
+    // Enhanced validation
+    if (!req.body.part || req.body.part.trim() === '') {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: 'Clip duration is required. Please specify how long each video part should be.' });
+    }
+
     if (introSec < 0 || outroSec < 0 || partSec <= 0) {
       fs.unlinkSync(req.file.path);
       return res.status(400).json({ error: 'Invalid time values. All values must be positive, and part duration must be greater than 0.' });

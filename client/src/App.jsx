@@ -36,6 +36,11 @@ export default function App() {
     e.preventDefault()
     if (!video) return alert('Please choose a video file')
     
+    // Validate clip duration
+    if (!part || part.trim() === '') {
+      return alert('⚠️ Clip duration is required!\n\nPlease enter the duration for each video part.\nExample: 600 (seconds) or 10:00 (mm:ss) or 0:10:00 (hh:mm:ss)')
+    }
+    
     // Check file size (50GB limit for movies)
     const maxSize = 50 * 1024 * 1024 * 1024; // 50GB in bytes
     if (video.size > maxSize) {
@@ -152,8 +157,8 @@ export default function App() {
           </div>
 
           <div style={{marginTop:16}}>
-            <label>Clip duration (sec or mm:ss or hh:mm:ss)</label>
-            <input type="text" placeholder="e.g. 600 or 10:00 or 0:10:00" value={part} onChange={e=>setPart(e.target.value)} disabled={disabled} />
+            <label>Clip duration (sec or mm:ss or hh:mm:ss) <span style={{color:'#e74c3c'}}>*</span></label>
+            <input type="text" placeholder="e.g. 600 or 10:00 or 0:10:00" value={part} onChange={e=>setPart(e.target.value)} disabled={disabled} required />
           </div>
 
           <div style={{marginTop:16}}>
